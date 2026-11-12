@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Masuk — Portal DKM Admin</title>
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+<div class="login-shell">
+  <div class="login-card">
+    <div style="text-align:center;margin-bottom:1rem;">
+      <strong style="font-family:var(--font-heading);font-size:20px;color:var(--primary);">Sabilul Huda</strong>
+      <p style="margin:0;font-size:12px;color:var(--text-muted);letter-spacing:.06em;">PORTAL DKM ADMIN</p>
+    </div>
+    <h1>Masuk ke Dashboard</h1>
+    <p style="font-size:13px;">Khusus Administrator &amp; Operator DKM Sabilul Huda.</p>
+    <form id="form-login">
+      <label style="display:block;font-size:13px;font-weight:600;margin:1rem 0 .3rem;">Email</label>
+      <input type="email" id="email" required placeholder="nama@sabilulhuda.id" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid var(--outline);">
+      <label style="display:block;font-size:13px;font-weight:600;margin:.8rem 0 .3rem;">Kata Sandi</label>
+      <input type="password" id="password" required placeholder="••••••••" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid var(--outline);">
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:1.3rem;">Masuk →</button>
+      <p id="login-status" style="font-size:13px;margin-top:.8rem;text-align:center;"></p>
+    </form>
+    <p style="text-align:center;font-size:12px;margin-top:1.2rem;"><a href="../index.html" style="color:var(--primary);">← Kembali ke Website Utama</a></p>
+  </div>
+</div>
+
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  if (Auth.isLoggedIn()) { window.location.href = 'index.html'; return; }
+  document.getElementById('form-login').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const status = document.getElementById('login-status');
+    status.style.color = 'var(--text-muted)'; status.textContent = 'Memeriksa kredensial…';
+    const res = await Api.post('login', { email: document.getElementById('email').value, password: document.getElementById('password').value });
+    if (res.success) {
+      Auth.setSession(res.data.token, res.data);
+      window.location.href = 'index.html';
+    } else {
+      status.style.color = 'var(--error)'; status.textContent = '⚠️ ' + res.message;
+    }
+  });
+});
+</script>
+</body>
+</html>

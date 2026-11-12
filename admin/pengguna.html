@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pengguna & Hak Akses — Portal DKM Admin</title>
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="brand">Sabilul Huda<small>PORTAL DKM ADMIN</small></div>
+    <nav class="admin-nav" id="admin-nav"></nav>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div><h1>Pengguna &amp; Hak Akses</h1><p style="margin:0;font-size:13px;color:var(--text-muted);">Kelola akun Administrator &amp; Operator DKM, serta hak akses RBAC.</p></div>
+      <div style="display:flex;gap:.8rem;align-items:center;">
+        <button class="btn btn-gold" id="btn-tambah">+ Tambah Pengguna</button>
+        <div class="admin-user" id="admin-user-box"></div>
+      </div>
+    </div>
+
+    <div class="admin-card">
+      <table class="admin-table">
+        <thead><tr><th>Nama</th><th>Email</th><th>Peran</th><th>Status</th><th>Dibuat</th><th>Aksi</th></tr></thead>
+        <tbody id="table-body"><tr><td colspan="6" class="empty-state">Memuat data…</td></tr></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <h3 id="modal-title">Tambah Pengguna</h3>
+    <form id="modal-form">
+      <label>Nama Lengkap</label><input type="text" name="nama" required>
+      <label>Email (Google Workspace)</label><input type="email" name="email" required>
+      <label>Peran</label>
+      <select name="peran" required>
+        <option value="operator">Operator DKM</option>
+        <option value="admin">Administrator</option>
+      </select>
+      <label id="label-password">Kata Sandi Awal</label><input type="password" name="password" id="input-password">
+      <p style="font-size:12px;color:var(--text-muted);">Kosongkan sandi saat menyunting jika tidak ingin mengubahnya.</p>
+    </form>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="btn-batal">Batal</button>
+      <button class="btn btn-primary" id="btn-simpan">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="js/admin.js"></script>
+<script>
+let daftarPengguna = [];
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = guardAdmin_();
+  if (!user) return;
+  if (user.peran !== 'admin') { document.querySelector('main').innerHTML = '<div class="empty-state">Halaman ini khusus untuk Administrator.</div>'; return; }
+  renderSidebar_('pengguna.html');
+  await muat();
+  document.getElementById('btn-tambah').addEventListener('click', () => bukaModal(null));
+  document.getElementById('btn-batal').addEventListener('click', () => document.getElementById('modal').classList.remove('open'));
+  document.getElementById('btn-simpan').addEventListener('click', simpan);
+});
+
+async function muat() {
+  const res = await Api.get('adminPengguna', { token: Auth.getToken() });
+  const tbody = document.getElementById('table-body');
+  if (!res.success) { tbody.innerHTML = `<tr><td colspan="6" class="empty-state">${res.message}</td></tr>`; return; }
+  daftarPengguna = res.data;
+  if (!daftarPengguna.length) { tbody.innerHTML = '<tr><td colspan="6" class="empty-state">Belum ada pengguna.</td></tr>'; return; }
+  tbody.innerHTML = daftarPengguna.map(u => `
+    <tr>
+      <td>${u.nama}</td><td>${u.email}</td>
+      <td style="text-transform:capitalize;">${u.peran}</td>
+      <td>${labelStatus(u.status)}</td>
+      <td>${formatTanggalIndo(u.tanggal_dibuat)}</td>
+      <td style="white-space:nowrap;">
+        <button class="icon-btn" data-aksi="edit" data-id="${u.ID}">✏️</button>
+        ${u.status==='aktif' ? `<button class="icon-btn" data-aksi="nonaktif" data-id="${u.ID}">🚫</button>` : ''}
+      </td>
+    </tr>`).join('');
+  tbody.querySelectorAll('button[data-aksi]').forEach(btn => btn.addEventListener('click', async () => {
+    const id = btn.getAttribute('data-id');
+    if (btn.getAttribute('data-aksi') === 'edit') return bukaModal(daftarPengguna.find(u => String(u.ID)===id));
+    if (!confirm('Nonaktifkan akun ini?')) return;
+    const res = await Api.post('nonaktifkanPengguna', { id });
+    tampilkanToast(res.message, res.success);
+    if (res.success) await muat();
+  }));
+}
+
+function bukaModal(item) {
+  const form = document.getElementById('modal-form');
+  document.getElementById('modal-title').textContent = item ? 'Sunting Pengguna' : 'Tambah Pengguna';
+  form.nama.value = item ? item.nama : '';
+  form.email.value = item ? item.email : '';
+  form.peran.value = item ? item.peran : 'operator';
+  form.password.value = '';
+  form.password.required = !item;
+  document.getElementById('label-password').textContent = item ? 'Ganti Kata Sandi (opsional)' : 'Kata Sandi Awal';
+  form.dataset.id = item ? item.ID : '';
+  document.getElementById('modal').classList.add('open');
+}
+
+async function simpan() {
+  const form = document.getElementById('modal-form');
+  if (!form.reportValidity()) return;
+  const data = { nama: form.nama.value, email: form.email.value, peran: form.peran.value };
+  if (form.password.value) data.password = form.password.value;
+  if (form.dataset.id) data.ID = form.dataset.id;
+  const res = await Api.post('simpanPengguna', { data });
+  tampilkanToast(res.message, res.success);
+  if (res.success) { document.getElementById('modal').classList.remove('open'); await muat(); }
+}
+</script>
+</body>
+</html>

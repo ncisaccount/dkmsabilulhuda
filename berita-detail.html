@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title id="page-title">Detail Artikel — Masjid Sabilul Huda</title>
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .article-wrap { max-width: 760px; margin: 0 auto; }
+  .article-cover { aspect-ratio:16/9; border-radius:var(--radius-md); background-size:cover; background-position:center; margin:1.5rem 0; background-color:var(--surface-container); }
+  .article-body { font-size:16px; line-height:1.8; }
+  .article-body p { color: var(--text-dark); margin-bottom:1rem; }
+  .author-box { display:flex; gap:1rem; align-items:center; padding:1rem; background:var(--surface-container); border-radius:var(--radius-md); margin:2rem 0; }
+  .author-box .ph { width:52px;height:52px;border-radius:50%;background:var(--surface-white); }
+  .related-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem; }
+  @media (max-width:900px){ .related-grid{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="topbar"><div class="container"><span data-setting="alamat">Jl. Masjid Raya No. 123, Sukamaju</span><span><span data-setting="telepon">0812-3456-7890</span></span></div></div>
+<nav class="navbar"><div class="container">
+  <a class="brand" href="index.html"><div><strong>Masjid Sabilul Huda</strong><span>DKM SABILUL HUDA</span></div></a>
+  <div class="nav-links" id="nav-links">
+    <a href="index.html">Beranda</a><a href="profil.html">Profil</a><a href="program.html">Program</a>
+    <a href="berita.html" class="active">Berita</a><a href="agenda.html">Agenda</a><a href="galeri.html">Galeri</a><a href="kontak.html">Kontak</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:.8rem;">
+    <button id="theme-toggle" class="btn-ghost btn" style="padding:8px 12px;border-color:#a4d0c0;color:#fff;">🌙</button>
+    <a href="kontak.html#donasi" class="btn btn-gold">❤ Donasi</a>
+    <button class="nav-toggle" id="nav-toggle">☰</button>
+  </div>
+</div></nav>
+
+<section class="section">
+  <div class="container article-wrap" id="artikel-wrap" data-skeleton>
+    <div class="skeleton" style="height:24px;width:40%;margin-bottom:1rem;"></div>
+    <div class="skeleton" style="height:40px;width:90%;margin-bottom:1rem;"></div>
+    <div class="skeleton" style="height:300px;"></div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <h3>Baca Juga</h3>
+    <div id="related-grid" class="related-grid"></div>
+  </div>
+</section>
+
+<footer class="site-footer"><div class="container">
+  <div><strong style="color:#fff;font-family:var(--font-heading);font-size:16px;">Masjid Sabilul Huda</strong><p style="margin:.3rem 0 0;color:#9fb3ab;">Memakmurkan Masjid, Membangun Ukhuwah, Melayani Umat</p></div>
+  <div style="display:flex;gap:1.5rem;"><a href="kontak.html">Kontak Kami</a><a href="kontak.html">Lokasi</a><a href="#">Kebijakan Privasi</a><a href="#">Sitemap</a></div>
+</div></footer>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/shared.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  initThemeToggleShared(); initMobileNavShared();
+  const slug = new URLSearchParams(location.search).get('slug');
+  const wrap = document.getElementById('artikel-wrap');
+  if (!slug) { wrap.innerHTML = '<div class="empty-state">Artikel tidak ditemukan.</div>'; return; }
+  const res = await Api.get('beritaDetail', { slug });
+  if (!res.success) { wrap.innerHTML = `<div class="empty-state">${res.message}</div>`; return; }
+  const b = res.data;
+  document.getElementById('page-title').textContent = b.judul + ' — Masjid Sabilul Huda';
+  catatKunjunganHalaman('berita-detail:' + slug);
+  wrap.innerHTML = `
+    <div class="breadcrumb">Beranda / Berita &amp; Artikel / ${b.judul}</div>
+    <span class="tag">${b.kategori || 'Berita'}</span>
+    <h1>${b.judul}</h1>
+    <p class="meta">📅 ${formatTanggalIndo(b.tanggal)} &nbsp;•&nbsp; ✍️ ${b.penulis || 'Redaksi DKM'}</p>
+    ${b.gambar ? `<div class="article-cover" style="background-image:url('${b.gambar}')"></div>` : ''}
+    <div class="article-body">${(b.isi || '').split('\\n').filter(x=>x.trim()).map(p => `<p>${p}</p>`).join('')}</div>
+    <div class="author-box">
+      <div class="ph"></div>
+      <div><strong>${b.penulis || 'Redaksi DKM'}</strong><p style="margin:0;font-size:13px;">Tim Media &amp; Humas DKM Sabilul Huda</p></div>
+    </div>
+    <a href="berita.html" class="btn btn-ghost">← Kembali ke Semua Berita</a>
+  `;
+
+  const semua = await Api.get('berita', { perHalaman: 4 });
+  if (semua.success) {
+    const terkait = semua.data.items.filter(x => x.slug !== slug).slice(0, 3);
+    document.getElementById('related-grid').innerHTML = terkait.map(x => `
+      <a class="card" href="berita-detail.html?slug=${encodeURIComponent(x.slug)}">
+        <div class="card-img" style="background-image:url('${x.gambar||''}')"></div>
+        <div class="card-body"><h3 style="font-size:15px;">${x.judul}</h3><p class="meta">${formatTanggalIndo(x.tanggal)}</p></div>
+      </a>`).join('');
+  }
+});
+</script>
+</body>
+</html>

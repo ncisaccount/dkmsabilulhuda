@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jadwal Kajian Rutin — Masjid Sabilul Huda</title>
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .hero-sm { background: linear-gradient(135deg,var(--primary-dark),var(--primary)); color:#fff; padding:2.5rem 0; }
+  .hero-sm .container p { color:#cde3da; margin:0; }
+  .day-group { margin-bottom: 2rem; }
+  .day-head { display:flex; align-items:center; gap:.6rem; margin-bottom:.8rem; }
+  .day-head strong { font-family:var(--font-heading); font-size:18px; color:var(--primary); }
+  .day-count { background:var(--gold-light); color:#9A7528; font-size:12px; padding:2px 10px; border-radius:var(--radius-full); }
+  .kajian-row { display:grid; grid-template-columns:110px 1fr auto; gap:1rem; align-items:center; background:var(--surface-white); border-radius:var(--radius-md); padding:1rem 1.2rem; box-shadow:var(--shadow-card); margin-bottom:.8rem; }
+  .kajian-row .jam { font-weight:700; color:var(--primary); }
+  @media (max-width:700px){ .kajian-row{grid-template-columns:1fr; text-align:left;} }
+  .filter-bar { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+  .filter-chip { padding:6px 14px; border-radius:var(--radius-full); border:1px solid var(--outline); background:var(--surface-white); font-size:13px; cursor:pointer; }
+  .filter-chip.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+</style>
+</head>
+<body>
+<div class="topbar"><div class="container"><span data-setting="alamat">Jl. Masjid Raya No. 123, Sukamaju</span><span><span data-setting="telepon">0812-3456-7890</span></span></div></div>
+<nav class="navbar"><div class="container">
+  <a class="brand" href="index.html"><div><strong>Masjid Sabilul Huda</strong><span>DKM SABILUL HUDA</span></div></a>
+  <div class="nav-links" id="nav-links">
+    <a href="index.html">Beranda</a><a href="profil.html">Profil</a><a href="kajian.html" class="active">Kajian</a>
+    <a href="program.html">Program</a><a href="berita.html">Berita</a><a href="agenda.html">Agenda</a><a href="kontak.html">Kontak</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:.8rem;">
+    <button id="theme-toggle" class="btn-ghost btn" style="padding:8px 12px;border-color:#a4d0c0;color:#fff;">🌙</button>
+    <a href="kontak.html#donasi" class="btn btn-gold">❤ Donasi</a>
+    <button class="nav-toggle" id="nav-toggle">☰</button>
+  </div>
+</div></nav>
+
+<div class="hero-sm"><div class="container">
+  <div class="breadcrumb" style="color:#cde3da;">Beranda / Program &amp; Dakwah / Jadwal Kajian Rutin</div>
+  <h1 style="color:#fff;">Majelis Ilmu &amp; Tafaqquh Fiddin</h1>
+  <p>Menyediakan ruang rutin pemahaman keagamaan yang sistematis dan utuh, terbuka untuk seluruh jamaah dari anak-anak hingga lansia.</p>
+</div></div>
+
+<section class="section">
+  <div class="container">
+    <div class="filter-bar" id="filter-bar">
+      <button class="filter-chip active" data-filter="">Semua Hari</button>
+      <button class="filter-chip" data-filter="senin">Senin</button>
+      <button class="filter-chip" data-filter="selasa">Selasa</button>
+      <button class="filter-chip" data-filter="rabu">Rabu</button>
+      <button class="filter-chip" data-filter="kamis">Kamis</button>
+      <button class="filter-chip" data-filter="jumat">Jumat</button>
+      <button class="filter-chip" data-filter="sabtu">Sabtu</button>
+      <button class="filter-chip" data-filter="ahad">Ahad</button>
+    </div>
+    <div id="kajian-wrap" data-skeleton>
+      <div class="skeleton" style="height:70px;margin-bottom:1rem;"></div>
+      <div class="skeleton" style="height:70px;margin-bottom:1rem;"></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer"><div class="container">
+  <div><strong style="color:#fff;font-family:var(--font-heading);font-size:16px;">Masjid Sabilul Huda</strong><p style="margin:.3rem 0 0;color:#9fb3ab;">Memakmurkan Masjid, Membangun Ukhuwah, Melayani Umat</p></div>
+  <div style="display:flex;gap:1.5rem;"><a href="kontak.html">Kontak Kami</a><a href="kontak.html">Lokasi</a><a href="#">Kebijakan Privasi</a><a href="#">Sitemap</a></div>
+</div></footer>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/shared.js"></script>
+<script>
+const URUTAN_HARI = ['senin','selasa','rabu','kamis','jumat','sabtu','ahad'];
+let SEMUA_KAJIAN = [];
+document.addEventListener('DOMContentLoaded', async () => {
+  initThemeToggleShared(); initMobileNavShared(); catatKunjunganHalaman('kajian');
+  const res = await Api.get('kajian');
+  if (!res.success || !res.data.length) { document.getElementById('kajian-wrap').innerHTML = '<div class="empty-state">Jadwal kajian belum tersedia.</div>'; return; }
+  SEMUA_KAJIAN = res.data;
+  render('');
+  document.getElementById('filter-bar').addEventListener('click', (e) => {
+    if (!e.target.matches('.filter-chip')) return;
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    e.target.classList.add('active');
+    render(e.target.getAttribute('data-filter'));
+  });
+});
+
+function render(filterHari) {
+  const wrap = document.getElementById('kajian-wrap');
+  let data = SEMUA_KAJIAN;
+  if (filterHari) data = data.filter(k => (k.hari||'').toLowerCase() === filterHari);
+
+  const grouped = {};
+  data.forEach(k => { const h = (k.hari||'lainnya').toLowerCase(); (grouped[h] = grouped[h] || []).push(k); });
+  const hariUrut = Object.keys(grouped).sort((a,b) => URUTAN_HARI.indexOf(a) - URUTAN_HARI.indexOf(b));
+
+  if (!hariUrut.length) { wrap.innerHTML = '<div class="empty-state">Belum ada kajian pada hari ini.</div>'; return; }
+
+  wrap.innerHTML = hariUrut.map(hari => `
+    <div class="day-group">
+      <div class="day-head"><strong>${cap(hari)}</strong><span class="day-count">${grouped[hari].length} Kajian Rutin</span></div>
+      ${grouped[hari].map(k => `
+        <div class="kajian-row">
+          <div class="jam">${k.jam || '-'}</div>
+          <div>
+            <strong style="display:block;">${k.nama}</strong>
+            <p style="margin:.2rem 0 0;font-size:13px;">${k.tema || ''}</p>
+            <p class="meta" style="margin:.2rem 0 0;">👤 ${(k.penceramahInfo && k.penceramahInfo.nama) || '-'} &nbsp; 📍 ${k.lokasi || 'Masjid Sabilul Huda'}</p>
+          </div>
+          <span class="tag" style="margin:0;">${k.status === 'aktif' ? 'Aktif' : k.status}</span>
+        </div>`).join('')}
+    </div>`).join('');
+}
+function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+</script>
+</body>
+</html>

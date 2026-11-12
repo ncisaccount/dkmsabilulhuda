@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Dashboard — Portal DKM Admin</title>
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="brand">Sabilul Huda<small>PORTAL DKM ADMIN</small></div>
+    <nav class="admin-nav" id="admin-nav"></nav>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div>
+        <h1>Dashboard &amp; Ringkasan</h1>
+        <p style="margin:0;font-size:13px;color:var(--text-muted);">Pantau data operasional dakwah, moderasi konten, dan statistik kunjungan.</p>
+      </div>
+      <div class="admin-user" id="admin-user-box"></div>
+    </div>
+
+    <div class="stat-cards" id="stat-cards">
+      <div class="stat-card skeleton" style="height:70px;"></div>
+      <div class="stat-card skeleton" style="height:70px;"></div>
+      <div class="stat-card skeleton" style="height:70px;"></div>
+      <div class="stat-card skeleton" style="height:70px;"></div>
+    </div>
+
+    <div class="admin-card">
+      <h3 style="margin-top:0;">Antrean Moderasi Konten <span class="badge-status badge-draf" id="antrean-count">0</span></h3>
+      <p style="font-size:13px;color:var(--text-muted);margin-top:-.5rem;">Konten yang diajukan Operator dan menunggu persetujuan Administrator.</p>
+      <div id="antrean-list"><div class="empty-state">Memuat antrean…</div></div>
+    </div>
+
+    <div class="admin-card">
+      <h3 style="margin-top:0;">Daftar Konten Terkini</h3>
+      <table class="admin-table">
+        <thead><tr><th>Judul</th><th>Modul</th><th>Penulis</th><th>Tanggal</th><th>Status</th></tr></thead>
+        <tbody id="konten-terkini"><tr><td colspan="5" class="empty-state">Memuat…</td></tr></tbody>
+      </table>
+    </div>
+  </main>
+</div>
+
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="js/admin.js"></script>
+<script>
+const MODUL_MODERASI = ['berita', 'agenda', 'kajian', 'pengumuman', 'galeri', 'program'];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = guardAdmin_();
+  if (!user) return;
+  renderSidebar_('index.html');
+
+  const ring = await Api.get('adminRingkasan', { token: Auth.getToken() });
+  if (ring.success) {
+    const d = ring.data;
+    document.getElementById('stat-cards').innerHTML = `
+      <div class="stat-card"><div class="num">${d.totalKunjungan}</div><div class="lbl">Total Pengunjung Web</div></div>
+      <div class="stat-card"><div class="num">${d.menungguReview}</div><div class="lbl">Menunggu Review</div></div>
+      <div class="stat-card"><div class="num">${d.agendaAktif}</div><div class="lbl">Agenda Aktif</div></div>
+      <div class="stat-card"><div class="num">${d.totalBerita}</div><div class="lbl">Total Berita</div></div>`;
+  } else {
+    tampilkanToast(ring.message, false);
+  }
+
+  await muatAntrean();
+  await muatKontenTerkini();
+});
+
+async function muatAntrean() {
+  const semua = [];
+  for (const modul of MODUL_MODERASI) {
+    const res = await Api.get('adminList', { token: Auth.getToken(), modul, status: 'draf' });
+    if (res.success) res.data.forEach(item => semua.push(Object.assign({ _modul: modul }, item)));
+  }
+  document.getElementById('antrean-count').textContent = semua.length;
+  const wrap = document.getElementById('antrean-list');
+  if (!semua.length) { wrap.innerHTML = '<div class="empty-state">Tidak ada konten menunggu moderasi. 🎉</div>'; return; }
+  wrap.innerHTML = semua.map(item => `
+    <div class="admin-card" style="box-shadow:none;border:1px solid var(--outline);margin-bottom:.8rem;padding:1rem;">
+      <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:.6rem;">
+        <div>
+          <span class="tag">${item._modul}</span>
+          <strong style="display:block;">${item.judul || item.nama}</strong>
+          <small style="color:var(--text-muted);">oleh ${item.penulis || item.penanggung_jawab || '-'}</small>
+        </div>
+        <div style="display:flex;gap:.5rem;align-self:center;">
+          <button class="btn btn-primary" style="padding:6px 16px;" data-aksi="setuju" data-modul="${item._modul}" data-id="${item.ID}">✓ Terbitkan</button>
+          <button class="btn btn-ghost" style="padding:6px 16px;" data-aksi="tolak" data-modul="${item._modul}" data-id="${item.ID}">✗ Tolak</button>
+        </div>
+      </div>
+    </div>`).join('');
+
+  wrap.querySelectorAll('button[data-aksi]').forEach(btn => btn.addEventListener('click', async () => {
+    const aksi = btn.getAttribute('data-aksi'), modul = btn.getAttribute('data-modul'), id = btn.getAttribute('data-id');
+    const action = aksi === 'setuju' ? 'setujuiKonten' : 'tolakKonten';
+    const catatan = aksi === 'tolak' ? prompt('Catatan penolakan (opsional):') || '' : '';
+    const res = await Api.post(action, { modul, id, catatan });
+    tampilkanToast(res.success ? res.message : res.message, res.success);
+    if (res.success) { await muatAntrean(); await muatKontenTerkini(); }
+  }));
+}
+
+async function muatKontenTerkini() {
+  const semua = [];
+  for (const modul of MODUL_MODERASI) {
+    const res = await Api.get('adminList', { token: Auth.getToken(), modul });
+    if (res.success) res.data.forEach(item => semua.push(Object.assign({ _modul: modul }, item)));
+  }
+  semua.sort((a,b) => new Date(b.tanggal || b.tgl_mulai || 0) - new Date(a.tanggal || a.tgl_mulai || 0));
+  const tbody = document.getElementById('konten-terkini');
+  if (!semua.length) { tbody.innerHTML = '<tr><td colspan="5" class="empty-state">Belum ada konten.</td></tr>'; return; }
+  tbody.innerHTML = semua.slice(0, 10).map(item => `
+    <tr>
+      <td>${item.judul || item.nama}</td>
+      <td>${item._modul}</td>
+      <td>${item.penulis || item.penanggung_jawab || '-'}</td>
+      <td>${formatTanggalIndo(item.tanggal || item.tgl_mulai)}</td>
+      <td>${labelStatus(item.status)}</td>
+    </tr>`).join('');
+}
+</script>
+</body>
+</html>

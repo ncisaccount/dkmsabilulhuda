@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Imam & Penceramah — Masjid Sabilul Huda</title>
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .hero-sm { background: linear-gradient(135deg,var(--primary-dark),var(--primary)); color:#fff; padding:2.5rem 0; }
+  .hero-sm .container p { color:#cde3da; margin:0; }
+  .filter-bar { display:flex; gap:.6rem; flex-wrap:wrap; margin-bottom:1.5rem; }
+  .filter-chip { padding:6px 16px; border-radius:var(--radius-full); border:1px solid var(--outline); background:var(--surface-white); font-size:13px; cursor:pointer; }
+  .filter-chip.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+  .asatidz-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.2rem; }
+  @media (max-width:900px){ .asatidz-grid{grid-template-columns:1fr 1fr;} }
+  .asatidz-card { text-align:center; padding:1.3rem; }
+  .asatidz-card img, .asatidz-card .ph { width:76px;height:76px;border-radius:50%;object-fit:cover;margin:0 auto .7rem;background:var(--surface-container); }
+  .director-card { display:flex; gap:1.5rem; align-items:center; padding:1.5rem; }
+  .director-card img, .director-card .ph { width:120px;height:120px;border-radius:50%;object-fit:cover;background:var(--surface-container);flex-shrink:0; }
+</style>
+</head>
+<body>
+<div class="topbar"><div class="container"><span data-setting="alamat">Jl. Masjid Raya No. 123, Sukamaju</span><span><span data-setting="telepon">0812-3456-7890</span></span></div></div>
+<nav class="navbar"><div class="container">
+  <a class="brand" href="index.html"><div><strong>Masjid Sabilul Huda</strong><span>DKM SABILUL HUDA</span></div></a>
+  <div class="nav-links" id="nav-links">
+    <a href="index.html">Beranda</a><a href="profil.html">Profil</a><a href="imam.html" class="active">Imam &amp; Penceramah</a>
+    <a href="program.html">Program</a><a href="berita.html">Berita</a><a href="agenda.html">Agenda</a><a href="kontak.html">Kontak</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:.8rem;">
+    <button id="theme-toggle" class="btn-ghost btn" style="padding:8px 12px;border-color:#a4d0c0;color:#fff;">🌙</button>
+    <a href="kontak.html#donasi" class="btn btn-gold">❤ Donasi</a>
+    <button class="nav-toggle" id="nav-toggle">☰</button>
+  </div>
+</div></nav>
+
+<div class="hero-sm"><div class="container">
+  <div class="breadcrumb" style="color:#cde3da;">Beranda / Imam &amp; Penceramah</div>
+  <h1 style="color:#fff;">Korps Asatidz &amp; Dakwah Masjid</h1>
+  <p>Mengenal para asatidz, huffazh Al-Qur'an bersanad muttashil, dan dai pembina umat yang mengimami ibadah rawatib serta mengampu majelis keilmuan berkala di Masjid Sabilul Huda.</p>
+</div></div>
+
+<section class="section">
+  <div class="container">
+    <div id="imam-utama" data-skeleton></div>
+
+    <div class="filter-bar" id="filter-bar" style="margin-top:2rem;">
+      <button class="filter-chip active" data-filter="semua">Semua</button>
+      <button class="filter-chip" data-filter="imam">Imam Rawatib</button>
+      <button class="filter-chip" data-filter="dai">Dai / Pembina</button>
+      <button class="filter-chip" data-filter="penceramah">Penceramah / Khotib</button>
+    </div>
+    <div id="asatidz-grid" class="asatidz-grid" data-skeleton></div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--surface-container);padding-top:2.5rem;">
+  <div class="container">
+    <h2>Layanan Umat DKM</h2>
+    <p>Jamaah dapat mengajukan konsultasi bimbingan keislaman secara privat, bimbingan wawaris, maupun permohonan kehadiran asatidz untuk majelis taklim instansi atau perumahan.</p>
+    <a href="kontak.html" class="btn btn-primary">Hubungi Sekretariat Dakwah</a>
+  </div>
+</section>
+
+<footer class="site-footer"><div class="container">
+  <div><strong style="color:#fff;font-family:var(--font-heading);font-size:16px;">Masjid Sabilul Huda</strong><p style="margin:.3rem 0 0;color:#9fb3ab;">Memakmurkan Masjid, Membangun Ukhuwah, Melayani Umat</p></div>
+  <div style="display:flex;gap:1.5rem;"><a href="kontak.html">Kontak Kami</a><a href="kontak.html">Lokasi</a><a href="#">Kebijakan Privasi</a><a href="#">Sitemap</a></div>
+</div></footer>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/shared.js"></script>
+<script>
+let SEMUA_IMAM = [];
+document.addEventListener('DOMContentLoaded', async () => {
+  initThemeToggleShared(); initMobileNavShared(); catatKunjunganHalaman('imam');
+  const res = await Api.get('imam');
+  if (!res.success || !res.data.length) { document.getElementById('asatidz-grid').innerHTML = '<div class="empty-state">Data asatidz belum tersedia.</div>'; return; }
+  SEMUA_IMAM = res.data;
+  const utama = SEMUA_IMAM.find(i => /ketua|besar|syariah/i.test(i.peran || '')) || SEMUA_IMAM[0];
+  document.getElementById('imam-utama').innerHTML = `
+    <div class="card director-card">
+      ${utama.foto ? `<img src="${utama.foto}">` : `<div class="ph"></div>`}
+      <div>
+        <span class="tag">${utama.peran || 'Dewan Syariah'}</span>
+        <h3 style="margin:.2rem 0;">${utama.nama}</h3>
+        <p>${utama.bio || ''}</p>
+      </div>
+    </div>`;
+  renderAsatidz('semua');
+  document.getElementById('filter-bar').addEventListener('click', (e) => {
+    if (!e.target.matches('.filter-chip')) return;
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    e.target.classList.add('active');
+    renderAsatidz(e.target.getAttribute('data-filter'));
+  });
+});
+
+function renderAsatidz(filter) {
+  const wrap = document.getElementById('asatidz-grid');
+  let data = SEMUA_IMAM;
+  if (filter !== 'semua') data = data.filter(i => (i.peran || '').toLowerCase().includes(filter));
+  if (!data.length) { wrap.innerHTML = '<div class="empty-state">Belum ada data untuk kategori ini.</div>'; return; }
+  wrap.innerHTML = data.map(i => `
+    <div class="card asatidz-card">
+      ${i.foto ? `<img src="${i.foto}">` : `<div class="ph"></div>`}
+      <strong>${i.nama}</strong>
+      <p style="font-size:12px;color:var(--gold-hover);font-weight:600;margin:.2rem 0;">${i.peran || ''}</p>
+      <p style="font-size:12px;">${(i.bio||'').slice(0,60)}${(i.bio||'').length>60?'…':''}</p>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pengaturan Situs — Portal DKM Admin</title>
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="brand">Sabilul Huda<small>PORTAL DKM ADMIN</small></div>
+    <nav class="admin-nav" id="admin-nav"></nav>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div><h1>Pengaturan Situs</h1><p style="margin:0;font-size:13px;color:var(--text-muted);">Profil masjid, kontak publik, dan identitas visual yang tampil di seluruh halaman.</p></div>
+      <div class="admin-user" id="admin-user-box"></div>
+    </div>
+
+    <div class="admin-card">
+      <form id="form-pengaturan" class="grid grid-2">
+        <div><label style="font-size:13px;font-weight:600;">Nama Masjid</label><input type="text" name="nama_masjid" style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--outline);"></div>
+        <div><label style="font-size:13px;font-weight:600;">Tagline</label><input type="text" name="tagline" style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--outline);"></div>
+        <div><label style="font-size:13px;font-weight:600;">Alamat</label><input type="text" name="alamat" style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--outline);"></div>
+        <div><label style="font-size:13px;font-weight:600;">Telepon / WhatsApp</label><input type="text" name="telepon" style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--outline);"></div>
+        <div><label style="font-size:13px;font-weight:600;">Email</label><input type="email" name="email" style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--outline);"></div>
+        <div></div>
+        <div><label style="font-size:13px;font-weight:600;">Koordinat Latitude</label><input type="text" name="koordinat_lat" style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--outline);"></div>
+        <div><label style="font-size:13px;font-weight:600;">Koordinat Longitude</label><input type="text" name="koordinat_lng" style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--outline);"></div>
+        <div><label style="font-size:13px;font-weight:600;">Warna Primer</label><input type="color" name="warna_primer" style="width:100%;height:42px;border-radius:8px;border:1.5px solid var(--outline);"></div>
+        <div><label style="font-size:13px;font-weight:600;">Warna Aksen (Emas)</label><input type="color" name="warna_aksen" style="width:100%;height:42px;border-radius:8px;border:1.5px solid var(--outline);"></div>
+      </form>
+      <button class="btn btn-primary" id="btn-simpan" style="margin-top:1.3rem;">💾 Simpan Pengaturan</button>
+      <p id="status-msg" style="font-size:13px;margin-top:.6rem;"></p>
+    </div>
+  </main>
+</div>
+
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="js/admin.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = guardAdmin_();
+  if (!user) return;
+  if (user.peran !== 'admin') { document.querySelector('main').innerHTML = '<div class="empty-state">Halaman ini khusus untuk Administrator.</div>'; return; }
+  renderSidebar_('pengaturan.html');
+
+  const res = await Api.get('adminPengaturan', { token: Auth.getToken() });
+  const form = document.getElementById('form-pengaturan');
+  if (res.success) {
+    res.data.forEach(r => { if (form[r.key]) form[r.key].value = r.value; });
+  }
+  document.getElementById('btn-simpan').addEventListener('click', async () => {
+    const fd = new FormData(form);
+    const data = Object.fromEntries(fd.entries());
+    const status = document.getElementById('status-msg');
+    status.textContent = 'Menyimpan…'; status.style.color = 'var(--text-muted)';
+    const r = await Api.post('simpanPengaturan', { data });
+    status.textContent = r.success ? '✅ ' + r.message : '⚠️ ' + r.message;
+    status.style.color = r.success ? 'green' : 'var(--error)';
+  });
+});
+</script>
+</body>
+</html>

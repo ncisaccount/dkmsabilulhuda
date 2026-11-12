@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Masjid Sabilul Huda — Pusat Informasi, Dakwah, dan Pelayanan Umat</title>
+<meta name="description" content="Website resmi Masjid DKM Sabilul Huda: jadwal salat, kajian, agenda, berita, program, dan galeri kegiatan.">
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="container">
+    <span data-setting="alamat">Jl. Masjid Raya No. 123, Sukamaju</span>
+    <span><span data-setting="telepon">0812-3456-7890</span> &nbsp;|&nbsp; <span data-setting="email">info@sabilulhuda.id</span></span>
+  </div>
+</div>
+
+<nav class="navbar">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <div><strong>Masjid Sabilul Huda</strong><span>DKM SABILUL HUDA</span></div>
+    </a>
+    <div class="nav-links" id="nav-links">
+      <a href="index.html" class="active">Beranda</a>
+      <a href="profil.html">Profil</a>
+      <a href="program.html">Program</a>
+      <a href="berita.html">Berita</a>
+      <a href="agenda.html">Agenda</a>
+      <a href="galeri.html">Galeri</a>
+      <a href="kontak.html">Kontak</a>
+    </div>
+    <div style="display:flex;align-items:center;gap:.8rem;">
+      <button id="theme-toggle" class="btn-ghost btn" style="padding:8px 12px;border-color:#a4d0c0;color:#fff;">🌙</button>
+      <a href="kontak.html#donasi" class="btn btn-gold">❤ Donasi Sekarang</a>
+      <button class="nav-toggle" id="nav-toggle">☰</button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container">
+    <div>
+      <div class="badge">Selamat Datang di</div>
+      <h1>Masjid <span data-setting="nama_masjid">Sabilul Huda</span></h1>
+      <p class="tagline" data-setting="tagline">Pusat Informasi, Dakwah, dan Pelayanan Umat</p>
+      <p class="lead">Mari bersama memakmurkan masjid dengan ilmu, ibadah, dan kebaikan untuk membangun generasi umat yang berakhlak mulia.</p>
+      <div class="hero-actions">
+        <a href="profil.html" class="btn btn-gold">Jelajahi Informasi Masjid →</a>
+        <a href="galeri.html" class="btn-ghost btn" style="color:#fff;border-color:rgba(255,255,255,.5);">▶ Profil Masjid</a>
+      </div>
+    </div>
+
+    <div class="prayer-card" data-skeleton>
+      <div class="prayer-card-header">
+        <div>
+          <strong>Jadwal Salat Hari Ini</strong>
+          <small id="tanggal-hari-ini"></small>
+        </div>
+        <span>📅</span>
+      </div>
+      <div id="jadwal-salat-list">
+        <div class="prayer-row skeleton" style="height:40px;margin:8px;border:none;"></div>
+        <div class="prayer-row skeleton" style="height:40px;margin:8px;border:none;"></div>
+        <div class="prayer-row skeleton" style="height:40px;margin:8px;border:none;"></div>
+      </div>
+      <div class="prayer-countdown" id="prayer-countdown">Memuat jadwal salat…</div>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="quick-access">
+    <a class="quick-item" href="#jadwal"><div class="icon">🕐</div><strong>Jadwal Salat</strong><small>Tepat Waktu</small></a>
+    <a class="quick-item" href="kajian.html"><div class="icon">📖</div><strong>Kajian & Dakwah</strong><small>Inspiratif</small></a>
+    <a class="quick-item" href="program.html"><div class="icon">👥</div><strong>Program Masjid</strong><small>Beragam</small></a>
+    <a class="quick-item" href="galeri.html"><div class="icon">🖼</div><strong>Galeri Foto & Video</strong><small>Dokumentasi</small></a>
+    <a class="quick-item" href="berita.html"><div class="icon">📰</div><strong>Berita Terbaru</strong><small>Informasi Aktual</small></a>
+    <a class="quick-item" href="agenda.html"><div class="icon">📆</div><strong>Agenda Kegiatan</strong><small>Jadwal Lengkap</small></a>
+  </div>
+</div>
+
+<div id="pengumuman-banner" class="container" style="margin-top:1.5rem;"></div>
+
+<section class="section">
+  <div class="container grid grid-2">
+    <div>
+      <h2>Profil Masjid</h2>
+      <p>Masjid Sabilul Huda adalah pusat ibadah dan kegiatan keagamaan yang berkomitmen untuk memakmurkan masjid dan melayani umat dengan sepenuh hati melalui pembinaan spiritual, sosial, serta pendidikan berbasis nilai Islam rahmatan lil 'alamin.</p>
+      <a href="profil.html" class="btn btn-primary">Selengkapnya →</a>
+    </div>
+    <div>
+      <div class="section-head"><h2 style="margin:0;">Berita Terbaru</h2><a href="berita.html">Lihat Semua →</a></div>
+      <div id="berita-list" class="grid" data-skeleton>
+        <div class="card skeleton" style="height:140px;"></div>
+        <div class="card skeleton" style="height:140px;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="container grid" style="grid-template-columns:1fr 1fr 1fr;">
+    <div>
+      <div class="section-head"><h3 style="margin:0;">Agenda Kegiatan</h3><a href="agenda.html">Lihat Semua →</a></div>
+      <div id="agenda-list" class="grid" data-skeleton></div>
+    </div>
+    <div>
+      <div class="section-head"><h3 style="margin:0;">Program Masjid</h3><a href="program.html">Lihat Semua →</a></div>
+      <div id="program-list" class="grid" style="grid-template-columns:1fr 1fr;" data-skeleton></div>
+    </div>
+    <div class="donasi-box">
+      <h3>Mari Dukung Kemakmuran Masjid</h3>
+      <p>Dengan infaq dan donasi Anda, insyaAllah menjadi amal jariyah yang terus mengalir dan memperluas manfaat bagi sesama.</p>
+      <a href="kontak.html#donasi" class="btn btn-gold">Donasi Sekarang →</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="padding-top:0;">
+  <div class="container">
+    <div class="section-head"><h2 style="margin:0;">Galeri Dokumentasi</h2><a href="galeri.html">Lihat Semua →</a></div>
+    <div id="galeri-grid" class="gallery-grid" data-skeleton></div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div>
+      <strong style="color:#fff;font-family:var(--font-heading);font-size:16px;">Masjid Sabilul Huda</strong>
+      <p style="margin:.3rem 0 0;color:#9fb3ab;">Memakmurkan Masjid, Membangun Ukhuwah, Melayani Umat</p>
+    </div>
+    <div style="display:flex;gap:1.5rem;">
+      <a href="kontak.html">Kontak Kami</a>
+      <a href="kontak.html">Lokasi</a>
+      <a href="#">Kebijakan Privasi</a>
+      <a href="#">Sitemap</a>
+    </div>
+  </div>
+  <div class="container" style="margin-top:1.2rem;font-size:12px;color:#7a8f86;">© 2025 Masjid Sabilul Huda. All rights reserved.</div>
+</footer>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

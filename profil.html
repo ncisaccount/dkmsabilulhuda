@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Profil & Struktur Pengurus — Masjid Sabilul Huda</title>
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .hero-sm { background: linear-gradient(135deg,var(--primary-dark),var(--primary)); color:#fff; padding:2.5rem 0; }
+  .hero-sm .container p { color:#cde3da; margin:0; }
+  .breadcrumb { font-size:13px; color:var(--text-muted); margin-bottom:1rem; }
+  .stat-row { display:flex; gap:2rem; flex-wrap:wrap; margin:1.5rem 0; }
+  .stat-row div { text-align:left; }
+  .stat-row strong { display:block; font-size:24px; color:var(--primary); font-family:var(--font-heading); }
+  .pilar-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
+  @media (max-width:900px){ .pilar-grid{grid-template-columns:1fr 1fr;} .stat-row{gap:1rem;justify-content:space-between;} }
+  .pengurus-utama { max-width:420px; margin:0 auto 2rem; text-align:center; }
+  .pengurus-utama img, .pengurus-utama .ph { width:120px;height:120px;border-radius:50%;object-fit:cover;margin:0 auto 1rem;background:var(--surface-container); }
+  .pengurus-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.2rem; }
+  @media (max-width:900px){ .pengurus-grid{grid-template-columns:1fr 1fr;} }
+  .pengurus-card { text-align:center; }
+  .pengurus-card img, .pengurus-card .ph { width:76px;height:76px;border-radius:50%;object-fit:cover;margin:0 auto .7rem;background:var(--surface-container); }
+</style>
+</head>
+<body>
+<div class="topbar"><div class="container"><span data-setting="alamat">Jl. Masjid Raya No. 123, Sukamaju</span><span><span data-setting="telepon">0812-3456-7890</span></span></div></div>
+<nav class="navbar"><div class="container">
+  <a class="brand" href="index.html"><div><strong>Masjid Sabilul Huda</strong><span>DKM SABILUL HUDA</span></div></a>
+  <div class="nav-links" id="nav-links">
+    <a href="index.html">Beranda</a><a href="profil.html" class="active">Profil</a><a href="program.html">Program</a>
+    <a href="berita.html">Berita</a><a href="agenda.html">Agenda</a><a href="galeri.html">Galeri</a><a href="kontak.html">Kontak</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:.8rem;">
+    <button id="theme-toggle" class="btn-ghost btn" style="padding:8px 12px;border-color:#a4d0c0;color:#fff;">🌙</button>
+    <a href="kontak.html#donasi" class="btn btn-gold">❤ Donasi</a>
+    <button class="nav-toggle" id="nav-toggle">☰</button>
+  </div>
+</div></nav>
+
+<div class="hero-sm"><div class="container">
+  <div class="breadcrumb" style="color:#cde3da;">Beranda / Profil / Profil &amp; Struktur Pengurus</div>
+  <h1 style="color:#fff;">Profil &amp; Struktur Pengurus DKM</h1>
+  <p>Mengenal sejarah, visi misi keumatan, serta jajaran dewan pengurus Dewan Kemakmuran Masjid Sabilul Huda yang berkhidmat melayani jamaah.</p>
+</div></div>
+
+<section class="section">
+  <div class="container grid grid-2">
+    <div>
+      <h2>📖 Sejarah Singkat Pembangunan</h2>
+      <p>Masjid Sabilul Huda didirikan atas prakarsa para tokoh agama, sesepuh, dan warga Muslim Sukamaju, berawal dari gotong royong untuk membangun ruang ibadah sederhana. Kini, Masjid Sabilul Huda berdiri megah di atas lahan ±3.200 m², melayani ribuan jamaah setiap pekan lewat ibadah ritual, infaq terkelola secara akuntabel, kajian keilmuan, serta pemberdayaan ekonomi umat.</p>
+      <div class="stat-row">
+        <div><strong>2.500+</strong>Daya Tampung Jamaah</div>
+        <div><strong>3.200 m²</strong>Luas Tanah &amp; Bangunan</div>
+        <div><strong>18 Program</strong>Layanan Aktif ZISWAF</div>
+        <div><strong>1998 M</strong>Tahun Pendirian</div>
+      </div>
+    </div>
+    <div class="card"><div class="card-img" style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));display:flex;align-items:center;justify-content:center;color:#cde3da;font-family:var(--font-heading);">Interior Masjid</div></div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--surface-container);padding-top:3rem;padding-bottom:3rem;">
+  <div class="container grid grid-2">
+    <div class="card" style="padding:1.5rem;">
+      <h3>🕊 Visi Utama</h3>
+      <p style="font-family:var(--font-heading);font-style:italic;color:var(--primary);font-size:18px;">"Menjadi pusat peradaban Islam yang mandiri, makmur, dan melayani umat dengan rahmatan lil 'alamin."</p>
+      <p>Terwujudnya masjid yang tidak hanya hidup dalam ibadah mahdhah, melainkan juga menaungi pilar keilmuan, ekonomi, dan harmoni sosial warga Sukamaju.</p>
+    </div>
+    <div>
+      <h3>🎯 4 Pilar Misi DKM</h3>
+      <div class="pilar-grid">
+        <div class="card" style="padding:1rem;"><strong style="color:var(--primary);">Syiar Ibadah</strong><p style="font-size:13px;margin:.3rem 0 0;">Ketertiban salat &amp; keterampilan beribadah jamaah.</p></div>
+        <div class="card" style="padding:1rem;"><strong style="color:var(--primary);">Pendidikan</strong><p style="font-size:13px;margin:.3rem 0 0;">Kajian Qur'an, majelis ilmu, ruang kreatif remaja (RISMA).</p></div>
+        <div class="card" style="padding:1rem;"><strong style="color:var(--primary);">Ekonomi Umat</strong><p style="font-size:13px;margin:.3rem 0 0;">Zakat, Infaq, Sedekah, dan Wakaf (ZISWAF) bagi mustahik.</p></div>
+        <div class="card" style="padding:1rem;"><strong style="color:var(--primary);">Tata Kelola Digital</strong><p style="font-size:13px;margin:.3rem 0 0;">Transparansi keuangan &amp; informasi dakwah berbasis digital.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head"><h2 style="margin:0;">Susunan Pengurus 2024–2029</h2></div>
+    <div id="pengurus-utama" data-skeleton></div>
+    <div id="pengurus-grid" class="pengurus-grid" data-skeleton></div>
+  </div>
+</section>
+
+<footer class="site-footer"><div class="container">
+  <div><strong style="color:#fff;font-family:var(--font-heading);font-size:16px;">Masjid Sabilul Huda</strong><p style="margin:.3rem 0 0;color:#9fb3ab;">Memakmurkan Masjid, Membangun Ukhuwah, Melayani Umat</p></div>
+  <div style="display:flex;gap:1.5rem;"><a href="kontak.html">Kontak Kami</a><a href="kontak.html">Lokasi</a><a href="#">Kebijakan Privasi</a><a href="#">Sitemap</a></div>
+</div></footer>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  initThemeToggleShared(); initMobileNavShared(); catatKunjunganHalaman('profil');
+  const res = await Api.get('pengurus');
+  if (!res.success || !res.data.length) { document.getElementById('pengurus-grid').innerHTML = '<div class="empty-state">Data pengurus belum tersedia.</div>'; return; }
+  const list = res.data.slice().sort((a,b) => Number(a.urutan||99) - Number(b.urutan||99));
+  const utama = list[0], lainnya = list.slice(1);
+  document.getElementById('pengurus-utama').innerHTML = `
+    <div class="pengurus-utama">
+      ${utama.foto ? `<img src="${utama.foto}">` : `<div class="ph"></div>`}
+      <h3 style="margin:.2rem 0;">${utama.nama}</h3>
+      <p style="color:var(--gold-hover);font-weight:600;">${utama.jabatan}</p>
+    </div>`;
+  document.getElementById('pengurus-grid').innerHTML = lainnya.map(p => `
+    <div class="card pengurus-card" style="padding:1.2rem;">
+      ${p.foto ? `<img src="${p.foto}">` : `<div class="ph"></div>`}
+      <strong>${p.nama}</strong>
+      <p style="font-size:13px;color:var(--gold-hover);margin:.2rem 0 0;">${p.jabatan}</p>
+    </div>`).join('');
+});
+</script>
+<script src="js/shared.js"></script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Galeri Foto & Video — Masjid Sabilul Huda</title>
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .hero-sm { background: linear-gradient(135deg,var(--primary-dark),var(--primary)); color:#fff; padding:2.5rem 0; }
+  .hero-sm .container p { color:#cde3da; margin:0; }
+  .toolbar { display:flex; gap:1rem; flex-wrap:wrap; align-items:center; justify-content:space-between; margin-bottom:1.5rem; }
+  .filter-bar { display:flex; gap:.6rem; flex-wrap:wrap; }
+  .filter-chip { padding:6px 16px; border-radius:var(--radius-full); border:1px solid var(--outline); background:var(--surface-white); font-size:13px; cursor:pointer; }
+  .filter-chip.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+  .search-box { padding:10px 16px; border-radius:var(--radius-full); border:1px solid var(--outline); min-width:220px; font-family:var(--font-body); }
+  .gal-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
+  @media (max-width:900px){ .gal-grid{grid-template-columns:repeat(2,1fr);} }
+  .gal-item { position:relative; aspect-ratio:4/3; border-radius:var(--radius-md); overflow:hidden; background-size:cover; background-position:center; background-color:var(--surface-container); cursor:pointer; }
+  .gal-item .overlay { position:absolute; inset:0; background:linear-gradient(0deg,rgba(0,0,0,.65),transparent 50%); display:flex; align-items:flex-end; padding:.7rem; }
+  .gal-item .overlay span { color:#fff; font-size:13px; font-weight:600; }
+  .gal-item .play { position:absolute; top:8px; right:8px; background:rgba(0,0,0,.5); color:#fff; font-size:11px; padding:2px 8px; border-radius:var(--radius-full); }
+  .lightbox { position:fixed; inset:0; background:rgba(11,38,31,.9); display:none; align-items:center; justify-content:center; z-index:200; padding:2rem; }
+  .lightbox.open { display:flex; }
+  .lightbox img { max-width:90vw; max-height:85vh; border-radius:12px; }
+  .lightbox .close { position:absolute; top:20px; right:30px; color:#fff; font-size:32px; cursor:pointer; background:none; border:none; }
+</style>
+</head>
+<body>
+<div class="topbar"><div class="container"><span data-setting="alamat">Jl. Masjid Raya No. 123, Sukamaju</span><span><span data-setting="telepon">0812-3456-7890</span></span></div></div>
+<nav class="navbar"><div class="container">
+  <a class="brand" href="index.html"><div><strong>Masjid Sabilul Huda</strong><span>DKM SABILUL HUDA</span></div></a>
+  <div class="nav-links" id="nav-links">
+    <a href="index.html">Beranda</a><a href="profil.html">Profil</a><a href="program.html">Program</a>
+    <a href="berita.html">Berita</a><a href="agenda.html">Agenda</a><a href="galeri.html" class="active">Galeri</a><a href="kontak.html">Kontak</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:.8rem;">
+    <button id="theme-toggle" class="btn-ghost btn" style="padding:8px 12px;border-color:#a4d0c0;color:#fff;">🌙</button>
+    <a href="kontak.html#donasi" class="btn btn-gold">❤ Donasi</a>
+    <button class="nav-toggle" id="nav-toggle">☰</button>
+  </div>
+</div></nav>
+
+<div class="hero-sm"><div class="container">
+  <div class="breadcrumb" style="color:#cde3da;">Beranda / Dokumentasi &amp; Multimedia / Galeri Foto &amp; Video</div>
+  <h1 style="color:#fff;">Galeri Dokumentasi Kegiatan &amp; Syiar Ukhuwah</h1>
+  <p>Merekam jejak kebersamaan, kekhidmatan ibadah, dan geliat syiar dakwah DKM Sabilul Huda sebagai inspirasi dan transparansi khidmat kepada umat.</p>
+</div></div>
+
+<section class="section">
+  <div class="container">
+    <div class="toolbar">
+      <div class="filter-bar" id="filter-bar">
+        <button class="filter-chip active" data-filter="">Semua Media</button>
+        <button class="filter-chip" data-filter="foto">Foto Dokumentasi</button>
+        <button class="filter-chip" data-filter="video">Video &amp; Live</button>
+      </div>
+      <input type="search" id="search-box" class="search-box" placeholder="Cari dokumentasi, nama album...">
+    </div>
+    <div id="gal-grid" class="gal-grid" data-skeleton>
+      <div class="gal-item skeleton"></div><div class="gal-item skeleton"></div><div class="gal-item skeleton"></div><div class="gal-item skeleton"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--primary); color:#fff; text-align:center; padding:2.5rem 0;">
+  <div class="container">
+    <h2 style="color:#fff;">Punya Dokumentasi Kegiatan Masjid? Mari Berbagi Syiar!</h2>
+    <p style="color:#cde3da;">Setiap jepretan foto dan rekaman video yang merekam kebaikan di Masjid Sabilul Huda dapat menjadi ladang amal jariyah.</p>
+    <a href="kontak.html" class="btn btn-gold">Kirim Foto &amp; Video Anda</a>
+  </div>
+</section>
+
+<footer class="site-footer"><div class="container">
+  <div><strong style="color:#fff;font-family:var(--font-heading);font-size:16px;">Masjid Sabilul Huda</strong><p style="margin:.3rem 0 0;color:#9fb3ab;">Memakmurkan Masjid, Membangun Ukhuwah, Melayani Umat</p></div>
+  <div style="display:flex;gap:1.5rem;"><a href="kontak.html">Kontak Kami</a><a href="kontak.html">Lokasi</a><a href="#">Kebijakan Privasi</a><a href="#">Sitemap</a></div>
+</div></footer>
+
+<div class="lightbox" id="lightbox"><button class="close" id="lightbox-close">&times;</button><img id="lightbox-img" src=""></div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/shared.js"></script>
+<script>
+let SEMUA_GALERI = [];
+let state = { jenis: '', q: '' };
+document.addEventListener('DOMContentLoaded', async () => {
+  initThemeToggleShared(); initMobileNavShared(); catatKunjunganHalaman('galeri');
+  const res = await Api.get('galeri', { perHalaman: 300 });
+  if (!res.success) { document.getElementById('gal-grid').innerHTML = `<div class="empty-state">${res.message}</div>`; return; }
+  SEMUA_GALERI = res.data.items;
+  render();
+  document.getElementById('filter-bar').addEventListener('click', (e) => {
+    if (!e.target.matches('.filter-chip')) return;
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    e.target.classList.add('active'); state.jenis = e.target.getAttribute('data-filter'); render();
+  });
+  let timer;
+  document.getElementById('search-box').addEventListener('input', (e) => {
+    clearTimeout(timer); timer = setTimeout(() => { state.q = e.target.value.toLowerCase(); render(); }, 300);
+  });
+  document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+  document.getElementById('lightbox').addEventListener('click', (e) => { if (e.target.id === 'lightbox') closeLightbox(); });
+});
+
+function render() {
+  let data = SEMUA_GALERI.slice();
+  if (state.jenis) data = data.filter(g => (g.jenis||'').toLowerCase() === state.jenis);
+  if (state.q) data = data.filter(g => JSON.stringify(g).toLowerCase().includes(state.q));
+  const wrap = document.getElementById('gal-grid');
+  if (!data.length) { wrap.innerHTML = '<div class="empty-state">Belum ada dokumentasi untuk filter ini.</div>'; return; }
+  wrap.innerHTML = data.map((g,i) => `
+    <div class="gal-item" style="background-image:url('${g.tautan||''}')" data-i="${i}">
+      ${g.jenis === 'video' ? '<span class="play">▶ Video</span>' : ''}
+      <div class="overlay"><span>${g.judul||''}</span></div>
+    </div>`).join('');
+  document.querySelectorAll('.gal-item').forEach(el => el.addEventListener('click', () => {
+    const item = data[Number(el.getAttribute('data-i'))];
+    if (item.jenis === 'video') { window.open(item.tautan, '_blank'); return; }
+    openLightbox(item.tautan);
+  }));
+}
+function openLightbox(src) { document.getElementById('lightbox-img').src = src; document.getElementById('lightbox').classList.add('open'); }
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+</script>
+</body>
+</html>

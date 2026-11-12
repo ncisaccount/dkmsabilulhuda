@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kelola Konten — Portal DKM Admin</title>
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="admin-body">
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="brand">Sabilul Huda<small>PORTAL DKM ADMIN</small></div>
+    <nav class="admin-nav" id="admin-nav"></nav>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div><h1 id="page-title">Kelola Konten</h1><p style="margin:0;font-size:13px;color:var(--text-muted);" id="page-desc"></p></div>
+      <div style="display:flex;gap:.8rem;align-items:center;">
+        <button class="btn btn-gold" id="btn-tambah">+ Tambah Konten</button>
+        <div class="admin-user" id="admin-user-box"></div>
+      </div>
+    </div>
+
+    <div class="tab-bar" id="tab-bar"></div>
+
+    <div class="admin-card">
+      <div style="display:flex;gap:.6rem;margin-bottom:1rem;flex-wrap:wrap;">
+        <select id="filter-status" style="padding:8px 12px;border-radius:8px;border:1px solid var(--outline);">
+          <option value="">Semua Status</option>
+          <option value="draf">Draf</option>
+          <option value="terbit">Terbit</option>
+          <option value="ditolak">Ditolak</option>
+          <option value="aktif">Aktif</option>
+        </select>
+        <input type="search" id="search-box" placeholder="Cari judul/nama..." style="padding:8px 12px;border-radius:8px;border:1px solid var(--outline);flex:1;min-width:180px;">
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="admin-table" id="data-table">
+          <thead><tr id="table-head"></tr></thead>
+          <tbody id="table-body"><tr><td colspan="6" class="empty-state">Memuat data…</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <h3 id="modal-title">Tambah Konten</h3>
+    <form id="modal-form"></form>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" id="btn-batal">Batal</button>
+      <button class="btn btn-primary" id="btn-simpan">💾 Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="js/admin.js"></script>
+<script>
+// ============================================================================
+// SKEMA FORM PER MODUL — dipakai untuk membangun tabel & form secara dinamis
+// ============================================================================
+const SKEMA = {
+  berita: { title: 'Berita & Artikel', judulKey: 'judul', kolom: ['judul','kategori','tanggal'],
+    fields: [
+      {key:'judul', label:'Judul Berita', type:'text', required:true},
+      {key:'slug', label:'Slug URL (unik, tanpa spasi)', type:'text', required:true},
+      {key:'kategori', label:'Kategori', type:'select', options:['berita','artikel','keagamaan']},
+      {key:'gambar', label:'URL Gambar Sampul', type:'url'},
+      {key:'tanggal', label:'Tanggal Terbit', type:'date', required:true},
+      {key:'isi', label:'Isi Berita', type:'textarea', required:true},
+    ]},
+  agenda: { title: 'Agenda & Event Masjid', judulKey: 'judul', kolom: ['judul','kategori','tgl_mulai'],
+    fields: [
+      {key:'judul', label:'Judul Kegiatan', type:'text', required:true},
+      {key:'tgl_mulai', label:'Tanggal Mulai', type:'date', required:true},
+      {key:'tgl_selesai', label:'Tanggal Selesai', type:'date'},
+      {key:'lokasi', label:'Lokasi', type:'text'},
+      {key:'pengisi', label:'Pengisi Acara', type:'text'},
+      {key:'kategori', label:'Kategori', type:'select', options:['PHBI & Hari Besar','Sosial & ZISWAF','Remaja & RISMA','Pelatihan & Workshop']},
+    ]},
+  kajian: { title: 'Jadwal Kajian Mingguan', judulKey: 'nama', kolom: ['nama','hari','jam'], statusOptions: ['draf','aktif','nonaktif'],
+    fields: [
+      {key:'nama', label:'Nama Kajian', type:'text', required:true},
+      {key:'penceramah', label:'ID Penceramah (lihat modul Imam)', type:'text'},
+      {key:'hari', label:'Hari', type:'select', options:['senin','selasa','rabu','kamis','jumat','sabtu','ahad']},
+      {key:'jam', label:'Jam (contoh 05:30)', type:'text'},
+      {key:'lokasi', label:'Lokasi', type:'text'},
+      {key:'tema', label:'Tema / Deskripsi Singkat', type:'textarea'},
+    ]},
+  pengumuman: { title: 'Pengumuman', judulKey: 'judul', kolom: ['judul','prioritas','tanggal'],
+    fields: [
+      {key:'judul', label:'Judul Pengumuman', type:'text', required:true},
+      {key:'isi', label:'Isi Pengumuman', type:'textarea', required:true},
+      {key:'tanggal', label:'Tanggal Tayang', type:'date', required:true},
+      {key:'tanggal_akhir', label:'Tanggal Berakhir', type:'date'},
+      {key:'prioritas', label:'Prioritas', type:'select', options:['tinggi','sedang','rendah']},
+    ]},
+  galeri: { title: 'Galeri Foto & Video', judulKey: 'judul', kolom: ['judul','jenis','tanggal'],
+    fields: [
+      {key:'judul', label:'Judul Dokumentasi', type:'text', required:true},
+      {key:'jenis', label:'Jenis Media', type:'select', options:['foto','video']},
+      {key:'tautan', label:'URL Berkas (Google Drive/YouTube)', type:'url', required:true},
+      {key:'tanggal', label:'Tanggal Kegiatan', type:'date'},
+      {key:'kategori', label:'Kategori', type:'text'},
+    ]},
+  program: { title: 'Program Masjid', judulKey: 'nama', kolom: ['nama','penanggung_jawab','periode'],
+    fields: [
+      {key:'nama', label:'Nama Program', type:'text', required:true},
+      {key:'deskripsi', label:'Deskripsi', type:'textarea'},
+      {key:'penanggung_jawab', label:'Penanggung Jawab', type:'text'},
+      {key:'periode', label:'Periode', type:'text'},
+    ]},
+  pengurus: { title: 'Pengurus DKM', judulKey: 'nama', kolom: ['nama','jabatan','urutan'], statusOptions: ['aktif','nonaktif'],
+    fields: [
+      {key:'nama', label:'Nama Lengkap', type:'text', required:true},
+      {key:'jabatan', label:'Jabatan', type:'text', required:true},
+      {key:'periode', label:'Periode', type:'text'},
+      {key:'foto', label:'URL Foto', type:'url'},
+      {key:'urutan', label:'Urutan Tampil (angka)', type:'number'},
+    ]},
+  imam: { title: 'Imam & Penceramah', judulKey: 'nama', kolom: ['nama','peran','kontak'], statusOptions: ['aktif','nonaktif'],
+    fields: [
+      {key:'nama', label:'Nama Lengkap', type:'text', required:true},
+      {key:'peran', label:'Peran', type:'select', options:['Imam Rawatib','Dai / Pembina','Penceramah / Khotib']},
+      {key:'bio', label:'Biografi Singkat', type:'textarea'},
+      {key:'foto', label:'URL Foto', type:'url'},
+      {key:'kontak', label:'Kontak', type:'text'},
+    ]},
+};
+const SEMUA_MODUL = Object.keys(SKEMA);
+
+let modulAktif = '';
+let dataAktif = [];
+let userSaatIni = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
+  userSaatIni = guardAdmin_();
+  if (!userSaatIni) return;
+  modulAktif = new URLSearchParams(location.search).get('modul') || 'berita';
+  renderSidebar_('konten.html?modul=' + modulAktif);
+  renderTabBar();
+  await muatData();
+
+  document.getElementById('btn-tambah').addEventListener('click', () => bukaModal(null));
+  document.getElementById('btn-batal').addEventListener('click', tutupModal);
+  document.getElementById('filter-status').addEventListener('change', renderTabel);
+  let timer;
+  document.getElementById('search-box').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(renderTabel, 300); });
+});
+
+function renderTabBar() {
+  document.getElementById('tab-bar').innerHTML = SEMUA_MODUL.map(m => `
+    <button class="tab-btn ${m===modulAktif?'active':''}" data-m="${m}">${SKEMA[m].title}</button>`).join('');
+  document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => {
+    window.location.href = 'konten.html?modul=' + b.getAttribute('data-m');
+  }));
+  document.getElementById('page-title').textContent = SKEMA[modulAktif].title;
+  document.getElementById('page-desc').textContent = 'Kelola status terbit, sunting rincian, dan pantau alur persetujuan draf → terbit.';
+}
+
+async function muatData() {
+  document.getElementById('table-body').innerHTML = '<tr><td colspan="6" class="empty-state">Memuat data…</td></tr>';
+  const res = await Api.get('adminList', { token: Auth.getToken(), modul: modulAktif });
+  if (!res.success) { document.getElementById('table-body').innerHTML = `<tr><td colspan="6" class="empty-state">${res.message}</td></tr>`; return; }
+  dataAktif = res.data;
+  renderTabel();
+}
+
+function renderTabel() {
+  const skema = SKEMA[modulAktif];
+  const statusFilter = document.getElementById('filter-status').value;
+  const q = document.getElementById('search-box').value.toLowerCase();
+  let data = dataAktif.slice();
+  if (statusFilter) data = data.filter(d => d.status === statusFilter);
+  if (q) data = data.filter(d => JSON.stringify(d).toLowerCase().includes(q));
+
+  document.getElementById('table-head').innerHTML = skema.kolom.map(k => `<th>${k}</th>`).join('') + '<th>Status</th><th>Aksi</th>';
+
+  const tbody = document.getElementById('table-body');
+  if (!data.length) { tbody.innerHTML = `<tr><td colspan="${skema.kolom.length+2}" class="empty-state">Belum ada data.</td></tr>`; return; }
+
+  tbody.innerHTML = data.map(item => `
+    <tr>
+      ${skema.kolom.map(k => `<td>${(item[k]||'-').toString().slice(0,40)}</td>`).join('')}
+      <td>${labelStatus(item.status)}</td>
+      <td style="white-space:nowrap;">
+        <button class="icon-btn" data-aksi="edit" data-id="${item.ID}" title="Sunting">✏️</button>
+        <button class="icon-btn" data-aksi="hapus" data-id="${item.ID}" title="Hapus">🗑️</button>
+        ${(userSaatIni.peran==='admin' && item.status==='draf') ? `
+          <button class="icon-btn" data-aksi="setuju" data-id="${item.ID}" title="Terbitkan">✅</button>
+          <button class="icon-btn" data-aksi="tolak" data-id="${item.ID}" title="Tolak">⛔</button>` : ''}
+      </td>
+    </tr>`).join('');
+
+  tbody.querySelectorAll('button[data-aksi]').forEach(btn => btn.addEventListener('click', () => handleAksiTabel(btn)));
+}
+
+async function handleAksiTabel(btn) {
+  const aksi = btn.getAttribute('data-aksi'), id = btn.getAttribute('data-id');
+  const item = dataAktif.find(d => String(d.ID) === String(id));
+  if (aksi === 'edit') return bukaModal(item);
+  if (aksi === 'hapus') {
+    if (!confirm('Hapus konten ini secara permanen?')) return;
+    const res = await Api.post('hapusKonten', { modul: modulAktif, id });
+    tampilkanToast(res.message, res.success);
+    if (res.success) await muatData();
+  }
+  if (aksi === 'setuju' || aksi === 'tolak') {
+    const action = aksi === 'setuju' ? 'setujuiKonten' : 'tolakKonten';
+    const catatan = aksi === 'tolak' ? (prompt('Catatan penolakan (opsional):') || '') : '';
+    const res = await Api.post(action, { modul: modulAktif, id, catatan });
+    tampilkanToast(res.message, res.success);
+    if (res.success) await muatData();
+  }
+}
+
+function bukaModal(item) {
+  const skema = SKEMA[modulAktif];
+  document.getElementById('modal-title').textContent = item ? 'Sunting Konten' : 'Tambah Konten — ' + skema.title;
+  const form = document.getElementById('modal-form');
+  form.innerHTML = skema.fields.map(f => {
+    const val = item ? (item[f.key] ?? '') : '';
+    if (f.type === 'textarea') return `<label>${f.label}</label><textarea name="${f.key}" rows="4" ${f.required?'required':''}>${val}</textarea>`;
+    if (f.type === 'select') return `<label>${f.label}</label><select name="${f.key}" ${f.required?'required':''}>${f.options.map(o => `<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('')}</select>`;
+    return `<label>${f.label}</label><input type="${f.type}" name="${f.key}" value="${val}" ${f.required?'required':''}>`;
+  }).join('');
+  if (userSaatIni.peran === 'admin') {
+    const opsiStatus = skema.statusOptions || ['draf','terbit','ditolak'];
+    const statusSaatIni = item ? item.status : opsiStatus[opsiStatus.includes('terbit')?opsiStatus.indexOf('terbit'):0];
+    form.innerHTML += `<label>Status</label><select name="status">${opsiStatus.map(o => `<option value="${o}" ${statusSaatIni===o?'selected':''}>${o.charAt(0).toUpperCase()+o.slice(1)}</option>`).join('')}</select>`;
+  }
+  form.dataset.id = item ? item.ID : '';
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('btn-simpan').onclick = simpanModal;
+}
+function tutupModal() { document.getElementById('modal').classList.remove('open'); }
+
+async function simpanModal() {
+  const form = document.getElementById('modal-form');
+  if (!form.reportValidity()) return;
+  const fd = new FormData(form);
+  const data = Object.fromEntries(fd.entries());
+  if (form.dataset.id) data.ID = form.dataset.id;
+  const res = await Api.post('simpanKonten', { modul: modulAktif, data });
+  tampilkanToast(res.success ? res.message : res.message, res.success);
+  if (res.success) { tutupModal(); await muatData(); }
+}
+</script>
+</body>
+</html>

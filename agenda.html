@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Agenda Kegiatan — Masjid Sabilul Huda</title>
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .hero-sm { background: linear-gradient(135deg,var(--primary-dark),var(--primary)); color:#fff; padding:2.5rem 0; }
+  .hero-sm .container p { color:#cde3da; margin:0; }
+  .cal-toolbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; }
+  .cal-toolbar button { background:var(--surface-white); border:1px solid var(--outline); border-radius:50%; width:36px;height:36px;cursor:pointer; }
+  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+  .cal-dow { text-align:center; font-size:12px; font-weight:700; color:var(--text-muted); padding-bottom:.4rem; }
+  .cal-day { background:var(--surface-white); border-radius:10px; min-height:64px; padding:6px; font-size:13px; border:1px solid var(--outline); position:relative; }
+  .cal-day.outside { opacity:.35; }
+  .cal-day .dot { width:6px;height:6px;border-radius:50%; background:var(--gold); position:absolute; bottom:6px; left:6px; }
+  .cal-day.has-event { border-color: var(--gold); background: var(--gold-light); }
+  .filter-bar { display:flex; gap:.5rem; flex-wrap:wrap; margin:1.5rem 0; }
+  .filter-chip { padding:6px 14px; border-radius:var(--radius-full); border:1px solid var(--outline); background:var(--surface-white); font-size:13px; cursor:pointer; }
+  .filter-chip.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+</style>
+</head>
+<body>
+<div class="topbar"><div class="container"><span data-setting="alamat">Jl. Masjid Raya No. 123, Sukamaju</span><span><span data-setting="telepon">0812-3456-7890</span></span></div></div>
+<nav class="navbar"><div class="container">
+  <a class="brand" href="index.html"><div><strong>Masjid Sabilul Huda</strong><span>DKM SABILUL HUDA</span></div></a>
+  <div class="nav-links" id="nav-links">
+    <a href="index.html">Beranda</a><a href="profil.html">Profil</a><a href="program.html">Program</a>
+    <a href="berita.html">Berita</a><a href="agenda.html" class="active">Agenda</a><a href="galeri.html">Galeri</a><a href="kontak.html">Kontak</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:.8rem;">
+    <button id="theme-toggle" class="btn-ghost btn" style="padding:8px 12px;border-color:#a4d0c0;color:#fff;">🌙</button>
+    <a href="kontak.html#donasi" class="btn btn-gold">❤ Donasi</a>
+    <button class="nav-toggle" id="nav-toggle">☰</button>
+  </div>
+</div></nav>
+
+<div class="hero-sm"><div class="container">
+  <div class="breadcrumb" style="color:#cde3da;">Beranda / Agenda &amp; Kegiatan / Kalender Acara</div>
+  <h1 style="color:#fff;">Agenda &amp; Kalender Kegiatan Masjid</h1>
+  <p>Jadwal lengkap kegiatan keagamaan, perayaan hari besar Islam, bakti sosial, pelatihan kepemudaan, dan program komunikasi umat Masjid DKM Sabilul Huda.</p>
+</div></div>
+
+<section class="section">
+  <div class="container grid" style="grid-template-columns:1.1fr 1.5fr; align-items:start;">
+    <div class="card" style="padding:1.2rem;">
+      <div class="cal-toolbar">
+        <button id="prev-month">←</button>
+        <strong id="bulan-label" style="font-family:var(--font-heading);"></strong>
+        <button id="next-month">→</button>
+      </div>
+      <div class="cal-grid" id="cal-dow"></div>
+      <div class="cal-grid" id="cal-grid" style="margin-top:6px;"></div>
+    </div>
+
+    <div>
+      <div class="filter-bar" id="filter-bar">
+        <button class="filter-chip active" data-filter="">Semua Kategori</button>
+        <button class="filter-chip" data-filter="PHBI">PHBI &amp; Hari Besar</button>
+        <button class="filter-chip" data-filter="Sosial">Sosial &amp; ZISWAF</button>
+        <button class="filter-chip" data-filter="Remaja">Remaja &amp; RISMA</button>
+        <button class="filter-chip" data-filter="Pelatihan">Pelatihan</button>
+      </div>
+      <div id="agenda-list" class="grid" data-skeleton>
+        <div class="agenda-card skeleton" style="height:70px;"></div>
+        <div class="agenda-card skeleton" style="height:70px;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer"><div class="container">
+  <div><strong style="color:#fff;font-family:var(--font-heading);font-size:16px;">Masjid Sabilul Huda</strong><p style="margin:.3rem 0 0;color:#9fb3ab;">Memakmurkan Masjid, Membangun Ukhuwah, Melayani Umat</p></div>
+  <div style="display:flex;gap:1.5rem;"><a href="kontak.html">Kontak Kami</a><a href="kontak.html">Lokasi</a><a href="#">Kebijakan Privasi</a><a href="#">Sitemap</a></div>
+</div></footer>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/shared.js"></script>
+<script>
+const NAMA_BULAN = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const NAMA_HARI = ['Min','Sen','Sel','Rab','Kam','Jum','Sab'];
+let SEMUA_AGENDA = [];
+let cur = new Date();
+let kategoriAktif = '';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  initThemeToggleShared(); initMobileNavShared(); catatKunjunganHalaman('agenda');
+  document.getElementById('cal-dow').innerHTML = NAMA_HARI.map(h => `<div class="cal-dow">${h}</div>`).join('');
+
+  const res = await Api.get('agenda', { perHalaman: 500 });
+  if (res.success) SEMUA_AGENDA = res.data.items;
+  renderKalender();
+  renderList();
+
+  document.getElementById('prev-month').addEventListener('click', () => { cur.setMonth(cur.getMonth()-1); renderKalender(); });
+  document.getElementById('next-month').addEventListener('click', () => { cur.setMonth(cur.getMonth()+1); renderKalender(); });
+  document.getElementById('filter-bar').addEventListener('click', (e) => {
+    if (!e.target.matches('.filter-chip')) return;
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    e.target.classList.add('active');
+    kategoriAktif = e.target.getAttribute('data-filter');
+    renderList();
+  });
+});
+
+function tanggalPunyaAcara(tgl) {
+  return SEMUA_AGENDA.some(a => {
+    const d = new Date(a.tgl_mulai);
+    return d.getFullYear()===tgl.getFullYear() && d.getMonth()===tgl.getMonth() && d.getDate()===tgl.getDate();
+  });
+}
+
+function renderKalender() {
+  document.getElementById('bulan-label').textContent = `${NAMA_BULAN[cur.getMonth()]} ${cur.getFullYear()}`;
+  const firstDay = new Date(cur.getFullYear(), cur.getMonth(), 1);
+  const startOffset = firstDay.getDay();
+  const totalHari = new Date(cur.getFullYear(), cur.getMonth()+1, 0).getDate();
+  const grid = document.getElementById('cal-grid');
+  let html = '';
+  for (let i=0;i<startOffset;i++) html += `<div class="cal-day outside"></div>`;
+  for (let d=1; d<=totalHari; d++) {
+    const tgl = new Date(cur.getFullYear(), cur.getMonth(), d);
+    const ada = tanggalPunyaAcara(tgl);
+    html += `<div class="cal-day ${ada?'has-event':''}">${d}${ada?'<span class="dot"></span>':''}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function renderList() {
+  const wrap = document.getElementById('agenda-list');
+  let data = SEMUA_AGENDA.slice();
+  if (kategoriAktif) data = data.filter(a => (a.kategori||'').toLowerCase().includes(kategoriAktif.toLowerCase()));
+  data.sort((a,b) => new Date(a.tgl_mulai) - new Date(b.tgl_mulai));
+  if (!data.length) { wrap.innerHTML = '<div class="empty-state">Belum ada agenda untuk kategori ini.</div>'; return; }
+  wrap.innerHTML = data.map(a => {
+    const d = new Date(a.tgl_mulai);
+    const bln = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
+    return `
+    <div class="agenda-card">
+      <div class="agenda-date"><span class="d">${d.getDate()}</span><span class="m">${bln[d.getMonth()]}</span></div>
+      <div style="flex:1;">
+        <span class="tag">${a.kategori || 'Agenda'}</span>
+        <h3 style="font-size:16px;margin:.2rem 0;">${a.judul}</h3>
+        <p class="meta" style="margin:0;">📍 ${a.lokasi||'-'} &nbsp; 👤 ${a.pengisi||'-'}</p>
+      </div>
+    </div>`;
+  }).join('');
+}
+</script>
+</body>
+</html>

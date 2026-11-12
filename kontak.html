@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kontak & Lokasi — Masjid Sabilul Huda</title>
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .hero-sm { background: linear-gradient(135deg,var(--primary-dark),var(--primary)); color:#fff; padding:2.5rem 0; }
+  .hero-sm .container p { color:#cde3da; margin:0; }
+  .info-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:2rem; }
+  @media (max-width:900px){ .info-grid{grid-template-columns:1fr 1fr;} }
+  .info-card { padding:1.2rem; }
+  .info-card small { color:var(--gold-hover); font-weight:700; letter-spacing:.04em; font-size:11px; }
+  form label { display:block; font-size:13px; font-weight:600; margin:.8rem 0 .3rem; }
+  form input, form select, form textarea { width:100%; padding:10px 14px; border-radius:10px; border:1.5px solid var(--outline); font-family:var(--font-body); background:var(--surface-white); color:var(--text-dark); }
+  form input:focus, form select:focus, form textarea:focus { outline:none; border-color:var(--primary); }
+  .rekening-box { background:var(--primary); color:#fff; border-radius:var(--radius-md); padding:1.5rem; }
+  .rekening-box .akun { background:rgba(255,255,255,.08); border-radius:12px; padding:1rem; margin-top:1rem; }
+  .faq-item { border-bottom:1px solid var(--outline); padding:1rem 0; cursor:pointer; }
+  .faq-item strong { display:flex; justify-content:space-between; }
+  .faq-answer { display:none; margin-top:.5rem; font-size:14px; }
+  .faq-item.open .faq-answer { display:block; }
+</style>
+</head>
+<body>
+<div class="topbar"><div class="container"><span data-setting="alamat">Jl. Masjid Raya No. 123, Sukamaju</span><span><span data-setting="telepon">0812-3456-7890</span></span></div></div>
+<nav class="navbar"><div class="container">
+  <a class="brand" href="index.html"><div><strong>Masjid Sabilul Huda</strong><span>DKM SABILUL HUDA</span></div></a>
+  <div class="nav-links" id="nav-links">
+    <a href="index.html">Beranda</a><a href="profil.html">Profil</a><a href="program.html">Program</a>
+    <a href="berita.html">Berita</a><a href="agenda.html">Agenda</a><a href="galeri.html">Galeri</a><a href="kontak.html" class="active">Kontak</a>
+  </div>
+  <div style="display:flex;align-items:center;gap:.8rem;">
+    <button id="theme-toggle" class="btn-ghost btn" style="padding:8px 12px;border-color:#a4d0c0;color:#fff;">🌙</button>
+    <a href="#donasi" class="btn btn-gold">❤ Donasi</a>
+    <button class="nav-toggle" id="nav-toggle">☰</button>
+  </div>
+</div></nav>
+
+<div class="hero-sm"><div class="container">
+  <div class="breadcrumb" style="color:#cde3da;">Beranda / Hubungi Kami / Kontak &amp; Lokasi Masjid</div>
+  <h1 style="color:#fff;">Kontak &amp; Lokasi Masjid Sabilul Huda</h1>
+  <p>Pintu masjid dan ruang pengurus senantiasa terbuka untuk silaturahmi, bimbingan keislaman, permohonan layanan umat, konsultasi muallaf, serta penyaluran infaq jariyah dan wakaf kemaslahatan.</p>
+</div></div>
+
+<section class="section">
+  <div class="container">
+    <div class="info-grid">
+      <div class="card info-card"><small>ALAMAT UTAMA</small><p style="color:var(--text-dark);margin:.3rem 0 0;" data-setting="alamat">Jl. Masjid Raya No. 123, Sukamaju</p></div>
+      <div class="card info-card"><small>TELEPON &amp; WHATSAPP</small><p style="color:var(--text-dark);margin:.3rem 0 0;" data-setting="telepon">0812-3456-7890</p></div>
+      <div class="card info-card"><small>SURAT &amp; EMAIL</small><p style="color:var(--text-dark);margin:.3rem 0 0;" data-setting="email">info@sabilulhuda.id</p></div>
+      <div class="card info-card"><small>JAM LAYANAN DKM</small><p style="color:var(--text-dark);margin:.3rem 0 0;">08.00 – 20.00 WIB</p></div>
+    </div>
+
+    <div class="grid grid-2">
+      <div class="card" style="padding:1.5rem;">
+        <h3>Kirim Pesan atau Permohonan Layanan</h3>
+        <form id="form-kontak">
+          <label>Nama Lengkap Jamaah *</label>
+          <input type="text" name="nama" required placeholder="Contoh: Muhammad Rasyid">
+          <label>Nomor WhatsApp / HP *</label>
+          <input type="tel" name="whatsapp" required placeholder="0812-xxxx-xxxx">
+          <label>Alamat Email Aktif</label>
+          <input type="email" name="email" placeholder="nama@email.com">
+          <label>Kategori Keperluan *</label>
+          <select name="kategori" required>
+            <option value="">Pilih Kategori...</option>
+            <option>Konsultasi Syariah</option>
+            <option>Peminjaman Aula / Fasilitas</option>
+            <option>Permohonan Ambulans</option>
+            <option>Infaq &amp; Donasi</option>
+            <option>Lainnya</option>
+          </select>
+          <label>Subjek Pesan *</label>
+          <input type="text" name="subjek" required>
+          <label>Detail Pesan / Uraian Permohonan *</label>
+          <textarea name="pesan" rows="4" required placeholder="Mohon sertakan tanggal perkiraan acara (jika peminjaman fasilitas) atau rincian pertanyaan secara lengkap."></textarea>
+          <button type="submit" class="btn btn-gold" style="margin-top:1.2rem;width:100%;justify-content:center;">📤 Kirim Pesan Sekarang</button>
+          <p id="form-status" style="font-size:13px;margin-top:.6rem;"></p>
+        </form>
+      </div>
+      <div>
+        <div class="card" style="aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--surface-container),var(--outline));color:var(--text-muted);">
+          Peta Lokasi Masjid<br>(Sematkan Google Maps embed Anda di sini)
+        </div>
+        <div class="card" style="padding:1.2rem;margin-top:1rem;">
+          <h3 style="margin-top:0;">🚗 Akses &amp; Transportasi</h3>
+          <p>🅿️ Parkir Mobil: Kapasitas 80 unit di pelataran barat &amp; basement.</p>
+          <p>🏍 Parkir Motor: Kapasitas 250 unit tertutup atap dan dipantau CCTV 24 jam.</p>
+          <p>♿ Ramah Disabilitas &amp; Lansia: Tersedia ramp &amp; kursi roda di pintu timur masjid.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="donasi" style="padding-top:0;">
+  <div class="container">
+    <div class="rekening-box">
+      <h3>Saluran Infaq, Sedekah &amp; Wakaf</h3>
+      <p style="color:#cde3da;">Setiap rupiah yang disalurkan melalui rekening terdaftar di bawah ini dikelola dengan prinsip transparansi syariah demi kemaslahatan umat.</p>
+      <div class="grid grid-3">
+        <div class="akun"><small style="color:#a4d0c0;">BSI (Bank Syariah Indonesia)</small><p style="color:#fff;font-size:18px;font-weight:700;margin:.4rem 0;">7145-0988-23</p><p style="color:#cde3da;margin:0;font-size:12px;">a.n. DKM Masjid Sabilul Huda</p></div>
+        <div class="akun"><small style="color:#a4d0c0;">BSI (Zakat &amp; Santunan)</small><p style="color:#fff;font-size:18px;font-weight:700;margin:.4rem 0;">7145-0988-31</p><p style="color:#cde3da;margin:0;font-size:12px;">a.n. ZISWAF Sabilul Huda</p></div>
+        <div class="akun"><small style="color:#a4d0c0;">Bank Muamalat (Wakaf)</small><p style="color:#fff;font-size:18px;font-weight:700;margin:.4rem 0;">101-0098-776</p><p style="color:#cde3da;margin:0;font-size:12px;">a.n. Wakaf Pembangunan Masjid</p></div>
+      </div>
+      <a href="https://wa.me/6281234567890" class="btn btn-gold" style="margin-top:1.2rem;">Konfirmasi Infaq via WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--surface-container);">
+  <div class="container">
+    <h2 style="text-align:center;">Pertanyaan Umum Seputar Kunjungan &amp; Layanan</h2>
+    <div id="faq-list" style="max-width:700px;margin:1.5rem auto 0;">
+      <div class="faq-item"><strong>Apakah masjid menyediakan tempat menginap bagi musafir? <span>+</span></strong><p class="faq-answer">Ya, tersedia ruang transit musafir terbatas. Silakan hubungi sekretariat untuk konfirmasi ketersediaan.</p></div>
+      <div class="faq-item"><strong>Bagaimana prosedur peminjaman aula serbaguna untuk akad nikah? <span>+</span></strong><p class="faq-answer">Ajukan permohonan minimal 14 hari kerja sebelumnya melalui formulir di atas atau datang langsung ke sekretariat.</p></div>
+      <div class="faq-item"><strong>Apakah layanan mobil ambulans benar-benar gratis untuk dhuafa? <span>+</span></strong><p class="faq-answer">Benar, layanan ambulans 24 jam disediakan gratis bagi jamaah dan warga sekitar, didukung dana ZISWAF.</p></div>
+      <div class="faq-item"><strong>Kapan waktu buka kantor sekretariat untuk konsultasi tatap muka? <span>+</span></strong><p class="faq-answer">Setiap hari pukul 08.00–20.00 WIB, kecuali saat waktu salat berlangsung.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer"><div class="container">
+  <div><strong style="color:#fff;font-family:var(--font-heading);font-size:16px;">Masjid Sabilul Huda</strong><p style="margin:.3rem 0 0;color:#9fb3ab;">Memakmurkan Masjid, Membangun Ukhuwah, Melayani Umat</p></div>
+  <div style="display:flex;gap:1.5rem;"><a href="kontak.html">Kontak Kami</a><a href="kontak.html">Lokasi</a><a href="#">Kebijakan Privasi</a><a href="#">Sitemap</a></div>
+</div></footer>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/shared.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  initThemeToggleShared(); initMobileNavShared(); catatKunjunganHalaman('kontak');
+
+  document.querySelectorAll('.faq-item').forEach(el => el.addEventListener('click', () => el.classList.toggle('open')));
+
+  document.getElementById('form-kontak').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const status = document.getElementById('form-status');
+    const fd = new FormData(e.target);
+    const data = Object.fromEntries(fd.entries());
+    status.textContent = 'Mengirim pesan…'; status.style.color = 'var(--text-muted)';
+    const res = await Api.post('kirimPesan', { data });
+    if (res.success) { status.textContent = '✅ ' + res.message; status.style.color = 'green'; e.target.reset(); }
+    else { status.textContent = '⚠️ ' + res.message; status.style.color = 'var(--error)'; }
+  });
+});
+</script>
+</body>
+</html>
