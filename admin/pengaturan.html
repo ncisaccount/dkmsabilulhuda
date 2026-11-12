@@ -12,7 +12,7 @@
 <body class="admin-body">
 <div class="admin-shell">
   <aside class="admin-sidebar">
-    <div class="brand">Sabilul Huda<small>PORTAL DKM ADMIN</small></div>
+    <div class="brand" style="display:flex;align-items:center;gap:.6rem;"><img id="admin-logo-img" src="" alt="Logo" style="display:none;height:34px;width:34px;object-fit:contain;border-radius:6px;background:#fff;"><span id="admin-logo-text">Sabilul Huda<small>PORTAL DKM ADMIN</small></span></div>
     <nav class="admin-nav" id="admin-nav"></nav>
   </aside>
 
@@ -38,13 +38,64 @@
       <button class="btn btn-primary" id="btn-simpan" style="margin-top:1.3rem;">💾 Simpan Pengaturan</button>
       <p id="status-msg" style="font-size:13px;margin-top:.6rem;"></p>
     </div>
+
+    <!-- [ADDITIVE v2 — Modul 05] Edit Logo Aplikasi -->
+    <div class="admin-card">
+      <h3 style="margin-top:0;">🖼 Logo Aplikasi</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin-top:-.5rem;">Rasio asli logo dipertahankan (object-fit: contain), tidak dipotong/didistorsi. Logo lama tidak terhapus sampai logo baru berhasil disimpan.</p>
+      <div class="grid grid-2">
+        <div>
+          <label style="font-size:13px;font-weight:600;">Logo Utama Website</label>
+          <img id="preview-logo_utama" style="height:60px;max-width:100%;object-fit:contain;display:block;margin:.4rem 0;background:var(--surface-container);border-radius:8px;padding:4px;">
+          <div id="upload-logo_utama"></div>
+        </div>
+        <div>
+          <label style="font-size:13px;font-weight:600;">Logo Dashboard Admin</label>
+          <img id="preview-logo_dashboard" style="height:60px;max-width:100%;object-fit:contain;display:block;margin:.4rem 0;background:var(--surface-container);border-radius:8px;padding:4px;">
+          <div id="upload-logo_dashboard"></div>
+        </div>
+        <div>
+          <label style="font-size:13px;font-weight:600;">Favicon</label>
+          <img id="preview-favicon" style="height:40px;width:40px;object-fit:contain;display:block;margin:.4rem 0;background:var(--surface-container);border-radius:8px;padding:4px;">
+          <div id="upload-favicon"></div>
+        </div>
+        <div>
+          <label style="font-size:13px;font-weight:600;">Logo Tampilan Mobile</label>
+          <img id="preview-logo_mobile" style="height:60px;max-width:100%;object-fit:contain;display:block;margin:.4rem 0;background:var(--surface-container);border-radius:8px;padding:4px;">
+          <div id="upload-logo_mobile"></div>
+        </div>
+      </div>
+      <button class="btn btn-primary" id="btn-simpan-logo" style="margin-top:1.2rem;">💾 Simpan Logo</button>
+      <button class="btn btn-ghost" id="btn-reset-logo" type="button">↺ Kembalikan ke Default (kosongkan)</button>
+      <p id="status-logo" style="font-size:13px;margin-top:.6rem;"></p>
+    </div>
+
+    <!-- [ADDITIVE v2 — Modul 03] Lokasi & Sinkronisasi Jadwal Shalat -->
+    <div class="admin-card">
+      <h3 style="margin-top:0;">🕌 Jadwal Shalat — Lokasi &amp; Sinkronisasi</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin-top:-.5rem;">
+        Sumber data: <strong>api.myquran.com</strong> (bersumber dari database Bimas Islam Kemenag RI). Kemenag tidak mempublikasikan API resmi untuk publik, sehingga ini adalah sumber terpercaya yang tersedia — granularitas hanya sampai level <strong>kabupaten/kota</strong>, bukan kecamatan.
+      </p>
+      <label style="font-size:13px;font-weight:600;">Cari Lokasi (contoh: "Tasikmalaya")</label>
+      <div style="display:flex;gap:.6rem;">
+        <input type="text" id="cari-lokasi" placeholder="Kabupaten/Kota..." style="flex:1;padding:9px 12px;border-radius:8px;border:1.5px solid var(--outline);">
+        <button class="btn btn-ghost" id="btn-cari-lokasi">🔍 Cari</button>
+      </div>
+      <div id="hasil-lokasi" style="margin-top:.8rem;"></div>
+      <div id="lokasi-aktif" style="margin-top:1rem;font-size:13px;"></div>
+      <button class="btn btn-primary" id="btn-sinkron-sekarang" style="margin-top:1rem;">🔄 Sinkronkan Jadwal Bulan Ini Sekarang</button>
+      <p id="status-jadwal" style="font-size:13px;margin-top:.6rem;"></p>
+      <p style="font-size:11px;color:var(--text-muted);">Sinkronisasi otomatis harian hanya berjalan jika Administrator sudah menjalankan <code>pasangTriggerSinkronJadwalShalat()</code> sekali dari editor Apps Script (lihat README).</p>
+    </div>
   </main>
 </div>
 
 <script src="../js/config.js"></script>
 <script src="../js/api.js"></script>
 <script src="js/admin.js"></script>
+<script src="js/media-upload.js"></script>
 <script>
+const WIDGET_LOGO = {};
 document.addEventListener('DOMContentLoaded', async () => {
   const user = guardAdmin_();
   if (!user) return;
@@ -53,8 +104,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   const res = await Api.get('adminPengaturan', { token: Auth.getToken() });
   const form = document.getElementById('form-pengaturan');
+  let pengaturanMap = {};
   if (res.success) {
-    res.data.forEach(r => { if (form[r.key]) form[r.key].value = r.value; });
+    res.data.forEach(r => { pengaturanMap[r.key] = r.value; if (form[r.key]) form[r.key].value = r.value; });
   }
   document.getElementById('btn-simpan').addEventListener('click', async () => {
     const fd = new FormData(form);
@@ -62,6 +114,61 @@ document.addEventListener('DOMContentLoaded', async () => {
     const status = document.getElementById('status-msg');
     status.textContent = 'Menyimpan…'; status.style.color = 'var(--text-muted)';
     const r = await Api.post('simpanPengaturan', { data });
+    status.textContent = r.success ? '✅ ' + r.message : '⚠️ ' + r.message;
+    status.style.color = r.success ? 'green' : 'var(--error)';
+  });
+
+  // ===== [ADDITIVE v2] Modul 05 — Logo Aplikasi =====
+  ['logo_utama', 'logo_dashboard', 'favicon', 'logo_mobile'].forEach(key => {
+    WIDGET_LOGO[key] = initMediaUpload('upload-' + key, { kategori: 'logo', multiple: false, accept: 'image/png,image/jpeg,image/webp,image/svg+xml' });
+    if (pengaturanMap[key]) {
+      WIDGET_LOGO[key].setValue(pengaturanMap[key]);
+      document.getElementById('preview-' + key).src = pengaturanMap[key];
+    }
+  });
+  document.getElementById('btn-simpan-logo').addEventListener('click', async () => {
+    const status = document.getElementById('status-logo');
+    const data = {};
+    ['logo_utama', 'logo_dashboard', 'favicon', 'logo_mobile'].forEach(key => { data[key] = WIDGET_LOGO[key].getValue() || pengaturanMap[key] || ''; });
+    status.textContent = 'Menyimpan logo…'; status.style.color = 'var(--text-muted)';
+    const r = await Api.post('simpanPengaturan', { data });
+    status.textContent = r.success ? '✅ Logo berhasil disimpan & langsung diterapkan ke seluruh halaman.' : '⚠️ ' + r.message;
+    status.style.color = r.success ? 'green' : 'var(--error)';
+    if (r.success) ['logo_utama', 'logo_dashboard', 'favicon', 'logo_mobile'].forEach(k => document.getElementById('preview-' + k).src = data[k]);
+  });
+  document.getElementById('btn-reset-logo').addEventListener('click', async () => {
+    if (!confirm('Kembalikan semua logo ke default (kosong)?')) return;
+    const data = { logo_utama: '', logo_dashboard: '', favicon: '', logo_mobile: '' };
+    await Api.post('simpanPengaturan', { data });
+    ['logo_utama', 'logo_dashboard', 'favicon', 'logo_mobile'].forEach(k => document.getElementById('preview-' + k).src = '');
+    tampilkanToast('Logo dikembalikan ke default.', true);
+  });
+
+  // ===== [ADDITIVE v2] Modul 03 — Lokasi & Sinkronisasi Jadwal Shalat =====
+  const resLokasi = await Api.get('lokasiShalatAktif', { token: Auth.getToken() });
+  if (resLokasi.success && resLokasi.data.nama) {
+    document.getElementById('lokasi-aktif').innerHTML = `📍 Lokasi aktif: <strong>${resLokasi.data.nama}</strong>`;
+  } else {
+    document.getElementById('lokasi-aktif').innerHTML = `<span style="color:var(--error);">⚠️ Lokasi belum diatur. Cari dan pilih lokasi di atas terlebih dahulu.</span>`;
+  }
+  document.getElementById('btn-cari-lokasi').addEventListener('click', async () => {
+    const q = document.getElementById('cari-lokasi').value.trim();
+    if (!q) return;
+    const res2 = await Api.get('cariLokasiShalat', { token: Auth.getToken(), q });
+    const wrap = document.getElementById('hasil-lokasi');
+    if (!res2.success) { wrap.innerHTML = `<div class="empty-state">${res2.message}</div>`; return; }
+    if (!res2.data.length) { wrap.innerHTML = '<div class="empty-state">Lokasi tidak ditemukan.</div>'; return; }
+    wrap.innerHTML = res2.data.map(l => `<button type="button" class="tab-btn" data-id="${l.id}" data-nama="${l.lokasi}" style="margin:3px;">${l.lokasi}</button>`).join('');
+    wrap.querySelectorAll('button[data-id]').forEach(btn => btn.addEventListener('click', async () => {
+      const r = await Api.post('simpanLokasiShalat', { id: btn.getAttribute('data-id'), nama: btn.getAttribute('data-nama') });
+      tampilkanToast(r.message, r.success);
+      if (r.success) document.getElementById('lokasi-aktif').innerHTML = `📍 Lokasi aktif: <strong>${btn.getAttribute('data-nama')}</strong>`;
+    }));
+  });
+  document.getElementById('btn-sinkron-sekarang').addEventListener('click', async () => {
+    const status = document.getElementById('status-jadwal');
+    status.textContent = 'Menyinkronkan dari api.myquran.com…'; status.style.color = 'var(--text-muted)';
+    const r = await Api.post('sinkronJadwalShalat', {});
     status.textContent = r.success ? '✅ ' + r.message : '⚠️ ' + r.message;
     status.style.color = r.success ? 'green' : 'var(--error)';
   });

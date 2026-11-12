@@ -24,8 +24,23 @@ const MENU_ADMIN_ONLY = [
   { href: 'pengguna.html', label: 'Pengguna & Hak Akses', icon: '🔐' },
   { href: 'pengaturan.html', label: 'Pengaturan Situs', icon: '⚙️' },
 ];
+// [ADDITIVE v2 — Modul 06] tersedia untuk Admin maupun Operator (profil milik sendiri).
+const MENU_SEMUA_PERAN = [
+  { href: 'profil-saya.html', label: 'Edit Profil Saya', icon: '👤' },
+];
+
+// [ADDITIVE v2 — Modul 05] Terapkan logo dashboard admin jika sudah diatur.
+async function terapkanLogoDashboard_() {
+  const res = await Api.get('pengaturan');
+  if (!res.success) return;
+  const map = {}; res.data.forEach(r => map[r.key] = r.value);
+  const img = document.getElementById('admin-logo-img');
+  const txt = document.getElementById('admin-logo-text');
+  if (img && map.logo_dashboard) { img.src = map.logo_dashboard; img.style.display = 'block'; if (txt) txt.style.display = 'none'; }
+}
 
 function renderSidebar_(activeHref) {
+  terapkanLogoDashboard_();
   const user = Auth.getUser();
   const nav = document.getElementById('admin-nav');
   if (!nav || !user) return;
@@ -34,6 +49,8 @@ function renderSidebar_(activeHref) {
     html += `<div class="group-label">Khusus Administrator</div>`;
     html += MENU_ADMIN_ONLY.map(m => `<a href="${m.href}" class="${activeHref===m.href?'active':''}">${m.icon} ${m.label}</a>`).join('');
   }
+  html += `<div class="group-label">Akun Saya</div>`;
+  html += MENU_SEMUA_PERAN.map(m => `<a href="${m.href}" class="${activeHref===m.href?'active':''}">${m.icon} ${m.label}</a>`).join('');
   nav.innerHTML = html;
 
   const userBox = document.getElementById('admin-user-box');

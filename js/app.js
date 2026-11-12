@@ -5,6 +5,9 @@
  */
 const NAMA_SALAT = { subuh: 'Subuh', zuhur: 'Dzuhur', ashar: 'Ashar', maghrib: 'Maghrib', isya: 'Isya' };
 const URUTAN_SALAT = ['subuh', 'zuhur', 'ashar', 'maghrib', 'isya'];
+// [ADDITIVE v2 — Modul 03] waktu tambahan (imsak/terbit/dhuha) ditampilkan terpisah,
+// tidak ikut dihitung dalam countdown "menuju waktu salat wajib berikutnya" di atas.
+const NAMA_SALAT_TAMBAHAN = { imsak: 'Imsak', terbit: 'Terbit', dhuha: 'Dhuha' };
 
 document.addEventListener('DOMContentLoaded', async () => {
   initThemeToggle();
@@ -27,6 +30,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function renderBeranda(data) {
   if (data.jadwalSalatHariIni) renderJadwalSalat(data.jadwalSalatHariIni);
+  if (data.jadwalSalatInfo) renderInfoSinkronJadwal(data.jadwalSalatInfo); // [ADDITIVE v2 — Modul 03]
   if (data.berita) renderBerita(data.berita);
   if (data.agenda) renderAgenda(data.agenda);
   if (data.program) renderProgram(data.program);
@@ -36,12 +40,7 @@ function renderBeranda(data) {
 }
 
 function renderPengaturan(list) {
-  const map = {};
-  list.forEach(r => map[r.key] = r.value);
-  document.querySelectorAll('[data-setting]').forEach(el => {
-    const key = el.getAttribute('data-setting');
-    if (map[key]) el.textContent = map[key];
-  });
+  terapkanPengaturanUmum_(list); // [ADDITIVE v2 — Modul 05] logika logo/data-setting kini terpusat di shared.js
 }
 
 function renderJadwalSalat(jadwal) {
@@ -74,6 +73,29 @@ function renderJadwalSalat(jadwal) {
   const jam = Math.floor(selisihMin / 60), menit = selisihMin % 60;
   const countdown = document.getElementById('prayer-countdown');
   if (countdown) countdown.textContent = `Menuju ${NAMA_SALAT[waktuNext]} ± ${jam}j ${menit}m lagi`;
+
+  // [ADDITIVE v2 — Modul 03] tampilkan Imsak/Terbit/Dhuha (jika sudah tersinkron)
+  // dan tanggal Hijriah, TANPA mengubah logika countdown waktu wajib di atas.
+  const tambahan = Object.keys(NAMA_SALAT_TAMBAHAN).filter(k => jadwal[k]);
+  if (tambahan.length) {
+    wrap.insertAdjacentHTML('afterbegin', tambahan.map(k => `
+      <div class="prayer-row" style="opacity:.75;font-size:13px;"><span>${NAMA_SALAT_TAMBAHAN[k]}</span><span class="time">${jadwal[k]}</span></div>`).join(''));
+  }
+  const hijriahEl = document.getElementById('jadwal-hijriah');
+  if (hijriahEl && jadwal.hijriah) hijriahEl.textContent = jadwal.hijriah;
+}
+
+function renderInfoSinkronJadwal(info) {
+  const el = document.getElementById('jadwal-sinkron-info');
+  if (!el) return;
+  if (info.sinkronTerakhir) {
+    el.textContent = 'Data Kemenag via myquran.com • sinkron terakhir: ' + formatTanggalIndo(info.sinkronTerakhir);
+  } else {
+    el.textContent = 'Jadwal belum pernah disinkronkan otomatis — hubungi Administrator.';
+  }
+  if (info.sinkronGagalTerakhir) {
+    el.textContent += ' ⚠️ Percobaan sinkron terakhir gagal, menampilkan data valid terakhir.';
+  }
 }
 
 function renderBerita(list) {
@@ -82,7 +104,7 @@ function renderBerita(list) {
   if (!list.length) { wrap.innerHTML = '<div class="empty-state">Belum ada berita.</div>'; return; }
   wrap.innerHTML = list.map(b => `
     <a class="card" href="berita-detail.html?slug=${encodeURIComponent(b.slug || '')}">
-      <div class="card-img" style="background-image:url('${b.gambar || ''}')"></div>
+      <div class="media-frame media-frame--16x9 media-frame--crop">${b.gambar ? `<img src="${b.gambar}" alt="${b.judul}" loading="lazy">` : ''}</div>
       <div class="card-body">
         <span class="tag">${b.kategori || 'Berita'}</span>
         <h3>${b.judul}</h3>
@@ -123,9 +145,13 @@ function renderProgram(list) {
 function renderGaleri(list) {
   const wrap = document.getElementById('galeri-grid');
   if (!wrap) return;
+  // [ADDITIVE v2 — Modul 02] thumbnail tetap pakai mode crop (sesuai untuk grid galeri),
+  // tautan ke halaman Galeri lengkap untuk pemutaran video penuh di dalam frame.
   wrap.innerHTML = list.map(g => `
-    <div class="g-item" style="background-image:url('${g.tautan || ''}')"><span>${g.judul || ''}</span></div>
-  `).join('');
+    <a class="g-item media-frame media-frame--1x1 media-frame--crop" href="galeri.html" style="position:relative;">
+      ${g.jenis === 'video' ? `<video src="${g.tautan||''}" muted></video><span class="media-play-badge">▶</span>` : `<img src="${g.tautan||''}" alt="${g.judul||''}" loading="lazy">`}
+      <span style="position:absolute;bottom:6px;left:8px;color:#fff;font-size:11px;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.6);">${g.judul||''}</span>
+    </a>`).join('');
 }
 
 function renderPengumuman(list) {

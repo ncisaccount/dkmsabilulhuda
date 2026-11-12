@@ -20,7 +20,7 @@
 <body>
 <div class="topbar"><div class="container"><span data-setting="alamat">Jl. Masjid Raya No. 123, Sukamaju</span><span><span data-setting="telepon">0812-3456-7890</span></span></div></div>
 <nav class="navbar"><div class="container">
-  <a class="brand" href="index.html"><div><strong>Masjid Sabilul Huda</strong><span>DKM SABILUL HUDA</span></div></a>
+  <a class="brand" href="index.html"><img id="site-logo-img" src="" alt="Logo Masjid Sabilul Huda" style="display:none;height:40px;width:40px;object-fit:contain;border-radius:8px;background:#fff;"><div id="site-logo-fallback"><strong>Masjid Sabilul Huda</strong><span>DKM SABILUL HUDA</span></div></a>
   <div class="nav-links" id="nav-links">
     <a href="index.html">Beranda</a><a href="profil.html">Profil</a><a href="program.html" class="active">Program</a>
     <a href="berita.html">Berita</a><a href="agenda.html">Agenda</a><a href="galeri.html">Galeri</a><a href="kontak.html">Kontak</a>
@@ -79,7 +79,7 @@
 <script>
 let SEMUA_PROGRAM = [];
 document.addEventListener('DOMContentLoaded', async () => {
-  initThemeToggleShared(); initMobileNavShared(); catatKunjunganHalaman('program');
+  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_(); catatKunjunganHalaman('program');
   const res = await Api.get('program');
   if (!res.success || !res.data.length) { document.getElementById('program-grid').innerHTML = '<div class="empty-state">Belum ada program terbit.</div>'; return; }
   SEMUA_PROGRAM = res.data;

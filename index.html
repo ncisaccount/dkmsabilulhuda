@@ -22,7 +22,8 @@
 <nav class="navbar">
   <div class="container">
     <a class="brand" href="index.html">
-      <div><strong>Masjid Sabilul Huda</strong><span>DKM SABILUL HUDA</span></div>
+      <img id="site-logo-img" src="" alt="Logo Masjid Sabilul Huda" style="display:none;height:40px;width:40px;object-fit:contain;border-radius:8px;background:#fff;">
+      <div id="site-logo-fallback"><strong>Masjid Sabilul Huda</strong><span>DKM SABILUL HUDA</span></div>
     </a>
     <div class="nav-links" id="nav-links">
       <a href="index.html" class="active">Beranda</a>
@@ -62,12 +63,14 @@
         </div>
         <span>📅</span>
       </div>
+      <div id="jadwal-hijriah" style="padding:.4rem 1.25rem 0;font-size:12px;color:var(--text-muted);"></div>
       <div id="jadwal-salat-list">
         <div class="prayer-row skeleton" style="height:40px;margin:8px;border:none;"></div>
         <div class="prayer-row skeleton" style="height:40px;margin:8px;border:none;"></div>
         <div class="prayer-row skeleton" style="height:40px;margin:8px;border:none;"></div>
       </div>
       <div class="prayer-countdown" id="prayer-countdown">Memuat jadwal salat…</div>
+      <div id="jadwal-sinkron-info" style="font-size:10px;color:var(--text-muted);text-align:center;padding:4px;"></div>
     </div>
   </div>
 </header>
@@ -145,6 +148,7 @@
 
 <script src="js/config.js"></script>
 <script src="js/api.js"></script>
+<script src="js/shared.js"></script>
 <script src="js/app.js"></script>
 </body>
 </html>

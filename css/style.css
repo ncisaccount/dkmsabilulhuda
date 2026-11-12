@@ -182,3 +182,37 @@ footer.site-footer a:hover { color: var(--gold); }
 @keyframes shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
 
 .empty-state { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 14px; }
+
+/* ============================================================================
+   [ADDITIVE v2] MODUL 02 — Media Display & Responsive Frame
+   Komponen generik dipakai di homepage, berita, galeri, dokumentasi, profil,
+   banner, halaman detail, dan dashboard admin (lihat juga admin.css).
+   Default: object-fit CONTAIN (foto/video utuh, tidak terpotong/terdistorsi).
+   Modifier .media-frame--crop: object-fit COVER (khusus thumbnail/hero).
+   ============================================================================ */
+.media-frame {
+  position: relative; width: 100%; background: var(--surface-container);
+  border-radius: var(--radius-md); overflow: hidden; display: flex;
+  align-items: center; justify-content: center;
+}
+.media-frame img, .media-frame video {
+  width: 100%; height: 100%; object-fit: contain; display: block; background: var(--surface-container);
+}
+.media-frame.media-frame--crop img, .media-frame.media-frame--crop video { object-fit: cover; }
+.media-frame--16x9 { aspect-ratio: 16/9; }
+.media-frame--4x3 { aspect-ratio: 4/3; }
+.media-frame--1x1 { aspect-ratio: 1/1; }
+.media-frame .media-play-badge {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: rgba(11,38,31,.25); color: #fff; font-size: 32px; cursor: pointer; transition: background .15s;
+}
+.media-frame .media-play-badge:hover { background: rgba(11,38,31,.4); }
+.media-frame video::-webkit-media-controls-panel { background: rgba(0,0,0,.4); }
+
+/* Lightbox generik foto & video (dipakai Galeri, Berita, Dokumentasi) */
+.lb-overlay { position: fixed; inset: 0; background: rgba(11,38,31,.92); display: none; align-items: center; justify-content: center; z-index: 400; padding: 1.5rem; }
+.lb-overlay.open { display: flex; }
+.lb-overlay .lb-content { max-width: 92vw; max-height: 88vh; }
+.lb-overlay .lb-content img { max-width: 92vw; max-height: 88vh; object-fit: contain; border-radius: 10px; }
+.lb-overlay .lb-content video { max-width: 92vw; max-height: 88vh; border-radius: 10px; background:#000; }
+.lb-overlay .lb-close { position: absolute; top: 20px; right: 28px; color: #fff; font-size: 32px; background: none; border: none; cursor: pointer; }

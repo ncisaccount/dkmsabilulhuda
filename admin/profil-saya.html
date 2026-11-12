@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Edit Profil Saya — Portal DKM Admin</title>
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+<style>
+  .profile-photo-row { display:flex; align-items:center; gap:1.2rem; margin-bottom:1.2rem; }
+  .profile-photo-row .ph { width:84px;height:84px;border-radius:50%;object-fit:cover;background:var(--surface-container); }
+  .role-pill { display:inline-block; padding:4px 14px; border-radius:var(--radius-full); background:var(--gold-light); color:#9A7528; font-size:12px; font-weight:700; text-transform:capitalize; }
+</style>
+</head>
+<body class="admin-body">
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="brand" style="display:flex;align-items:center;gap:.6rem;">
+      <img id="admin-logo-img" src="" alt="Logo" style="display:none;height:34px;width:34px;object-fit:contain;border-radius:6px;background:#fff;">
+      <span id="admin-logo-text">Sabilul Huda<small>PORTAL DKM ADMIN</small></span>
+    </div>
+    <nav class="admin-nav" id="admin-nav"></nav>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div><h1>Edit Profil Saya</h1><p style="margin:0;font-size:13px;color:var(--text-muted);">Perbarui data diri dan kata sandi akun Anda sendiri.</p></div>
+      <div class="admin-user" id="admin-user-box"></div>
+    </div>
+
+    <div class="admin-card" style="max-width:560px;">
+      <h3 style="margin-top:0;">Informasi Profil</h3>
+      <div class="profile-photo-row">
+        <img class="ph" id="preview-foto" src="" alt="">
+        <div id="upload-foto-profil" style="flex:1;"></div>
+      </div>
+      <form id="form-profil">
+        <label style="font-size:13px;font-weight:600;">Nama Lengkap</label>
+        <input type="text" name="nama" required style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--outline);margin-bottom:.8rem;">
+        <label style="font-size:13px;font-weight:600;">Username</label>
+        <input type="text" name="username" style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--outline);margin-bottom:.8rem;">
+        <label style="font-size:13px;font-weight:600;">Email</label>
+        <input type="email" id="field-email" disabled style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--outline);background:var(--surface-container);margin-bottom:.4rem;">
+        <p style="font-size:11px;color:var(--text-muted);margin-top:0;">Email adalah identitas login dan hanya dapat diganti oleh Administrator melalui menu Pengguna &amp; Hak Akses.</p>
+        <label style="font-size:13px;font-weight:600;">Nomor Telepon</label>
+        <input type="tel" name="no_telepon" style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--outline);margin-bottom:.8rem;">
+        <label style="font-size:13px;font-weight:600;">Jabatan / Role</label>
+        <div><span class="role-pill" id="role-pill">-</span></div>
+        <p style="font-size:11px;color:var(--text-muted);">Role tidak dapat diubah lewat halaman ini (hanya Administrator yang dapat mengubah hak akses).</p>
+        <button type="submit" class="btn btn-primary" style="margin-top:.8rem;">💾 Simpan Perubahan</button>
+        <p id="status-profil" style="font-size:13px;margin-top:.6rem;"></p>
+      </form>
+    </div>
+
+    <div class="admin-card" style="max-width:560px;">
+      <h3 style="margin-top:0;">Ganti Kata Sandi</h3>
+      <form id="form-password">
+        <label style="font-size:13px;font-weight:600;">Password Lama</label>
+        <input type="password" name="passwordLama" required style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--outline);margin-bottom:.8rem;">
+        <label style="font-size:13px;font-weight:600;">Password Baru (min. 8 karakter)</label>
+        <input type="password" name="passwordBaru" required minlength="8" style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--outline);margin-bottom:.8rem;">
+        <label style="font-size:13px;font-weight:600;">Konfirmasi Password Baru</label>
+        <input type="password" name="konfirmasi" required minlength="8" style="width:100%;padding:9px 12px;border-radius:8px;border:1.5px solid var(--outline);margin-bottom:.8rem;">
+        <button type="submit" class="btn btn-ghost">🔑 Ganti Password</button>
+        <p id="status-password" style="font-size:13px;margin-top:.6rem;"></p>
+      </form>
+    </div>
+  </main>
+</div>
+
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="js/admin.js"></script>
+<script src="js/media-upload.js"></script>
+<script>
+let widgetFoto;
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = guardAdmin_();
+  if (!user) return;
+  renderSidebar_('profil-saya.html');
+
+  widgetFoto = initMediaUpload('upload-foto-profil', { kategori: 'profil', multiple: false, accept: 'image/*' });
+
+  const res = await Api.get('profilSaya', { token: Auth.getToken() });
+  if (!res.success) { tampilkanToast(res.message, false); return; }
+  const data = res.data;
+  const form = document.getElementById('form-profil');
+  form.nama.value = data.nama || '';
+  form.username.value = data.username || '';
+  form.no_telepon.value = data.no_telepon || '';
+  document.getElementById('field-email').value = data.email || '';
+  document.getElementById('role-pill').textContent = data.peran;
+  document.getElementById('preview-foto').src = data.foto_profil || '';
+  if (data.foto_profil) widgetFoto.setValue(data.foto_profil);
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const status = document.getElementById('status-profil');
+    const fotoUrl = widgetFoto.getValue();
+    const payload = { nama: form.nama.value, username: form.username.value, no_telepon: form.no_telepon.value };
+    if (fotoUrl) payload.foto_profil = fotoUrl;
+    status.textContent = 'Menyimpan…'; status.style.color = 'var(--text-muted)';
+    const r = await Api.post('updateProfilSaya', { data: payload });
+    status.textContent = r.success ? '✅ ' + r.message : '⚠️ ' + r.message;
+    status.style.color = r.success ? 'green' : 'var(--error)';
+    if (r.success) {
+      const u = Auth.getUser(); u.nama = payload.nama; Auth.setSession(Auth.getToken(), u);
+      document.getElementById('preview-foto').src = fotoUrl || document.getElementById('preview-foto').src;
+    }
+  });
+
+  document.getElementById('form-password').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = e.target;
+    const status = document.getElementById('status-password');
+    if (f.passwordBaru.value !== f.konfirmasi.value) { status.textContent = '⚠️ Konfirmasi password baru tidak cocok.'; status.style.color = 'var(--error)'; return; }
+    status.textContent = 'Memproses…'; status.style.color = 'var(--text-muted)';
+    const r = await Api.post('gantiPasswordSaya', { passwordLama: f.passwordLama.value, passwordBaru: f.passwordBaru.value });
+    status.textContent = r.success ? '✅ ' + r.message : '⚠️ ' + r.message;
+    status.style.color = r.success ? 'green' : 'var(--error)';
+    if (r.success) f.reset();
+  });
+});
+</script>
+</body>
+</html>

@@ -12,15 +12,16 @@
 <body class="admin-body">
 <div class="admin-shell">
   <aside class="admin-sidebar">
-    <div class="brand">Sabilul Huda<small>PORTAL DKM ADMIN</small></div>
+    <div class="brand" style="display:flex;align-items:center;gap:.6rem;"><img id="admin-logo-img" src="" alt="Logo" style="display:none;height:34px;width:34px;object-fit:contain;border-radius:6px;background:#fff;"><span id="admin-logo-text">Sabilul Huda<small>PORTAL DKM ADMIN</small></span></div>
     <nav class="admin-nav" id="admin-nav"></nav>
   </aside>
 
   <main class="admin-main">
     <div class="admin-topbar">
       <div><h1 id="page-title">Kelola Konten</h1><p style="margin:0;font-size:13px;color:var(--text-muted);" id="page-desc"></p></div>
-      <div style="display:flex;gap:.8rem;align-items:center;">
-        <button class="btn btn-gold" id="btn-tambah">+ Tambah Konten</button>
+      <div style="display:flex;gap:.8rem;align-items:center;flex-wrap:wrap;">
+        <button class="btn btn-ghost" id="btn-tulis-docs" style="display:none;">📝 Tulis via Google Docs</button>
+        <button class="btn btn-gold" id="btn-tambah">+ Tambah Konten Manual</button>
         <div class="admin-user" id="admin-user-box"></div>
       </div>
     </div>
@@ -62,6 +63,7 @@
 <script src="../js/config.js"></script>
 <script src="../js/api.js"></script>
 <script src="js/admin.js"></script>
+<script src="js/media-upload.js"></script>
 <script>
 // ============================================================================
 // SKEMA FORM PER MODUL — dipakai untuk membangun tabel & form secara dinamis
@@ -72,9 +74,9 @@ const SKEMA = {
       {key:'judul', label:'Judul Berita', type:'text', required:true},
       {key:'slug', label:'Slug URL (unik, tanpa spasi)', type:'text', required:true},
       {key:'kategori', label:'Kategori', type:'select', options:['berita','artikel','keagamaan']},
-      {key:'gambar', label:'URL Gambar Sampul', type:'url'},
+      {key:'gambar', label:'Gambar Sampul', type:'media', kategoriMedia:'berita'},
       {key:'tanggal', label:'Tanggal Terbit', type:'date', required:true},
-      {key:'isi', label:'Isi Berita', type:'textarea', required:true},
+      {key:'isi', label:'Isi Berita (atau tulis lewat tombol "Tulis via Google Docs")', type:'textarea'},
     ]},
   agenda: { title: 'Agenda & Event Masjid', judulKey: 'judul', kolom: ['judul','kategori','tgl_mulai'],
     fields: [
@@ -106,7 +108,7 @@ const SKEMA = {
     fields: [
       {key:'judul', label:'Judul Dokumentasi', type:'text', required:true},
       {key:'jenis', label:'Jenis Media', type:'select', options:['foto','video']},
-      {key:'tautan', label:'URL Berkas (Google Drive/YouTube)', type:'url', required:true},
+      {key:'tautan', label:'Berkas Foto/Video', type:'media', kategoriMedia:'galeri'},
       {key:'tanggal', label:'Tanggal Kegiatan', type:'date'},
       {key:'kategori', label:'Kategori', type:'text'},
     ]},
@@ -122,7 +124,7 @@ const SKEMA = {
       {key:'nama', label:'Nama Lengkap', type:'text', required:true},
       {key:'jabatan', label:'Jabatan', type:'text', required:true},
       {key:'periode', label:'Periode', type:'text'},
-      {key:'foto', label:'URL Foto', type:'url'},
+      {key:'foto', label:'Foto Profil', type:'media', kategoriMedia:'profil'},
       {key:'urutan', label:'Urutan Tampil (angka)', type:'number'},
     ]},
   imam: { title: 'Imam & Penceramah', judulKey: 'nama', kolom: ['nama','peran','kontak'], statusOptions: ['aktif','nonaktif'],
@@ -130,7 +132,7 @@ const SKEMA = {
       {key:'nama', label:'Nama Lengkap', type:'text', required:true},
       {key:'peran', label:'Peran', type:'select', options:['Imam Rawatib','Dai / Pembina','Penceramah / Khotib']},
       {key:'bio', label:'Biografi Singkat', type:'textarea'},
-      {key:'foto', label:'URL Foto', type:'url'},
+      {key:'foto', label:'Foto Profil', type:'media', kategoriMedia:'profil'},
       {key:'kontak', label:'Kontak', type:'text'},
     ]},
 };
@@ -150,6 +152,20 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   document.getElementById('btn-tambah').addEventListener('click', () => bukaModal(null));
   document.getElementById('btn-batal').addEventListener('click', tutupModal);
+  // [ADDITIVE v2 — Modul 04] tombol khusus alur Google Docs, hanya tampil di modul Berita.
+  const btnDocs = document.getElementById('btn-tulis-docs');
+  if (modulAktif === 'berita') {
+    btnDocs.style.display = 'inline-flex';
+    btnDocs.addEventListener('click', async () => {
+      const judul = prompt('Judul awal berita (bisa diubah lagi nanti di Google Docs):');
+      if (judul === null) return;
+      const res = await Api.post('buatDraftBeritaDocs', { judul, kategori: 'berita' });
+      if (!res.success) { tampilkanToast(res.message, false); return; }
+      tampilkanToast(res.message, true);
+      window.open(res.data.googleDocsUrl, '_blank');
+      await muatData();
+    });
+  }
   document.getElementById('filter-status').addEventListener('change', renderTabel);
   let timer;
   document.getElementById('search-box').addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(renderTabel, 300); });
@@ -189,13 +205,20 @@ function renderTabel() {
   tbody.innerHTML = data.map(item => `
     <tr>
       ${skema.kolom.map(k => `<td>${(item[k]||'-').toString().slice(0,40)}</td>`).join('')}
-      <td>${labelStatus(item.status)}</td>
+      <td>${labelStatus(item.status)}${(modulAktif==='berita' && item.statusEditorial) ? `<br><span class="badge-status" style="background:var(--gold-light);color:#9A7528;margin-top:3px;display:inline-block;">${item.statusEditorial}</span>` : ''}</td>
       <td style="white-space:nowrap;">
         <button class="icon-btn" data-aksi="edit" data-id="${item.ID}" title="Sunting">✏️</button>
         <button class="icon-btn" data-aksi="hapus" data-id="${item.ID}" title="Hapus">🗑️</button>
         ${(userSaatIni.peran==='admin' && item.status==='draf') ? `
           <button class="icon-btn" data-aksi="setuju" data-id="${item.ID}" title="Terbitkan">✅</button>
           <button class="icon-btn" data-aksi="tolak" data-id="${item.ID}" title="Tolak">⛔</button>` : ''}
+        ${(modulAktif==='berita' && item.googleDocsId) ? `
+          <button class="icon-btn" data-aksi="buka-docs" data-url="${'https://docs.google.com/document/d/'+item.googleDocsId+'/edit'}" title="Buka Google Docs">📄</button>
+          <button class="icon-btn" data-aksi="sinkron-docs" data-id="${item.ID}" title="Sinkronkan dari Docs">🔄</button>
+          ${userSaatIni.peran==='admin' ? `
+            <button class="icon-btn" data-aksi="jadwalkan-berita" data-id="${item.ID}" title="Jadwalkan Publikasi">📅</button>
+            <button class="icon-btn" data-aksi="publikasikan-berita" data-id="${item.ID}" title="Publikasikan Sekarang">🚀</button>
+            <button class="icon-btn" data-aksi="arsipkan-berita" data-id="${item.ID}" title="Arsipkan">🗄️</button>` : ''}` : ''}
       </td>
     </tr>`).join('');
 
@@ -219,18 +242,55 @@ async function handleAksiTabel(btn) {
     tampilkanToast(res.message, res.success);
     if (res.success) await muatData();
   }
+  // [ADDITIVE v2 — Modul 04] aksi khusus alur Google Docs untuk Berita
+  if (aksi === 'buka-docs') { window.open(btn.getAttribute('data-url'), '_blank'); }
+  if (aksi === 'sinkron-docs') {
+    tampilkanToast('Menyinkronkan dari Google Docs…', true);
+    const res = await Api.post('sinkronBeritaDocs', { beritaId: id });
+    tampilkanToast(res.success ? res.message : res.message, res.success);
+    if (res.success) await muatData();
+  }
+  if (aksi === 'jadwalkan-berita') {
+    const tgl = prompt('Jadwalkan publikasi pada tanggal & jam (format: YYYY-MM-DD HH:mm), contoh 2026-03-01 06:00:');
+    if (!tgl) return;
+    const res = await Api.post('jadwalkanBerita', { beritaId: id, tanggal: new Date(tgl).toISOString() });
+    tampilkanToast(res.message, res.success);
+    if (res.success) await muatData();
+  }
+  if (aksi === 'publikasikan-berita') {
+    if (!confirm('Publikasikan berita ini sekarang juga ke halaman publik?')) return;
+    const res = await Api.post('publikasikanBerita', { beritaId: id });
+    tampilkanToast(res.message, res.success);
+    if (res.success) await muatData();
+  }
+  if (aksi === 'arsipkan-berita') {
+    if (!confirm('Arsipkan berita ini? Berita tetap tersimpan namun ditandai arsip.')) return;
+    const res = await Api.post('arsipkanBerita', { beritaId: id });
+    tampilkanToast(res.message, res.success);
+    if (res.success) await muatData();
+  }
 }
+
+let WIDGET_MEDIA_MODAL = {}; // [ADDITIVE v2 — Modul 01] widget upload per field type:'media' di modal aktif
 
 function bukaModal(item) {
   const skema = SKEMA[modulAktif];
   document.getElementById('modal-title').textContent = item ? 'Sunting Konten' : 'Tambah Konten — ' + skema.title;
   const form = document.getElementById('modal-form');
+  WIDGET_MEDIA_MODAL = {};
   form.innerHTML = skema.fields.map(f => {
     const val = item ? (item[f.key] ?? '') : '';
+    if (f.type === 'media') return `<label>${f.label}</label><div id="modal-media-${f.key}"></div>`; // diisi initMediaUpload setelah innerHTML
     if (f.type === 'textarea') return `<label>${f.label}</label><textarea name="${f.key}" rows="4" ${f.required?'required':''}>${val}</textarea>`;
     if (f.type === 'select') return `<label>${f.label}</label><select name="${f.key}" ${f.required?'required':''}>${f.options.map(o => `<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('')}</select>`;
     return `<label>${f.label}</label><input type="${f.type}" name="${f.key}" value="${val}" ${f.required?'required':''}>`;
   }).join('');
+  // Inisialisasi widget upload UNTUK TIAP field bertipe 'media' (komponen reusable, Modul 01.D).
+  skema.fields.filter(f => f.type === 'media').forEach(f => {
+    WIDGET_MEDIA_MODAL[f.key] = initMediaUpload('modal-media-' + f.key, { kategori: f.kategoriMedia || 'lainnya', multiple: false });
+    const val = item ? (item[f.key] ?? '') : '';
+    if (val) WIDGET_MEDIA_MODAL[f.key].setValue(val);
+  });
   if (userSaatIni.peran === 'admin') {
     const opsiStatus = skema.statusOptions || ['draf','terbit','ditolak'];
     const statusSaatIni = item ? item.status : opsiStatus[opsiStatus.includes('terbit')?opsiStatus.indexOf('terbit'):0];
@@ -245,8 +305,10 @@ function tutupModal() { document.getElementById('modal').classList.remove('open'
 async function simpanModal() {
   const form = document.getElementById('modal-form');
   if (!form.reportValidity()) return;
+  if (Object.values(WIDGET_MEDIA_MODAL).some(w => w.isUploading())) { tampilkanToast('Tunggu proses upload media selesai terlebih dahulu.', false); return; }
   const fd = new FormData(form);
   const data = Object.fromEntries(fd.entries());
+  Object.keys(WIDGET_MEDIA_MODAL).forEach(key => { data[key] = WIDGET_MEDIA_MODAL[key].getValue(); }); // [ADDITIVE v2]
   if (form.dataset.id) data.ID = form.dataset.id;
   const res = await Api.post('simpanKonten', { modul: modulAktif, data });
   tampilkanToast(res.success ? res.message : res.message, res.success);
