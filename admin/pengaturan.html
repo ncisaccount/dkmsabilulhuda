@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
   document.getElementById('btn-sinkron-sekarang').addEventListener('click', async () => {
     const status = document.getElementById('status-jadwal');
-    status.textContent = 'Menyinkronkan dari api.myquran.com…'; status.style.color = 'var(--text-muted)';
+    status.textContent = '⏳ Menyinkronkan dari api.myquran.com (±28-31 hari diambil satu per satu, bisa memakan waktu hingga 1 menit, mohon tunggu)…'; status.style.color = 'var(--text-muted)';
     const r = await Api.post('sinkronJadwalShalat', {});
     status.textContent = r.success ? '✅ ' + r.message : '⚠️ ' + r.message;
     status.style.color = r.success ? 'green' : 'var(--error)';

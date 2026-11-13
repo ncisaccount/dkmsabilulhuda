@@ -135,16 +135,10 @@ function render() {
 // bawaan browser, dan menampilkan poster sebelum diputar.
 function openLightbox(item) {
   const content = document.getElementById('lightbox-content');
-  if (item.jenis === 'video') {
-    // [ADDITIVE v2 — koreksi audit] video Drive HANYA andal via iframe /preview resmi
-    // (lihat backend/Media.gs); YouTube tetap iframe embed biasa. <video src> dilepas
-    // karena sering gagal untuk berkas Drive (halaman konfirmasi/virus-scan, no range-request).
-    const isYoutube = /youtube\.com|youtu\.be/.test(item.tautan);
-    const src = isYoutube ? item.tautan.replace('watch?v=', 'embed/') : item.tautan;
-    content.innerHTML = `<iframe src="${src}" style="width:80vw;max-width:900px;aspect-ratio:16/9;border:0;border-radius:10px;" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
-  } else {
-    content.innerHTML = `<img src="${item.tautan}" alt="${item.judul||''}">`;
-  }
+  // [KONSOLIDASI v5] pakai renderMediaFrame_ bersama (shared.js) — satu-satunya
+  // tempat logika deteksi iframe Drive/YouTube/proxy video didefinisikan, supaya
+  // tidak ada lagi logika terpisah yang bisa saling tidak sinkron.
+  content.innerHTML = `<div style="width:80vw;max-width:900px;aspect-ratio:16/9;">${renderMediaFrame_(item.tautan)}</div>`;
   document.getElementById('lightbox').classList.add('open');
 }
 function closeLightbox() {

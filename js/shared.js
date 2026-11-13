@@ -59,14 +59,47 @@ function terapkanPengaturanUmum_(list) {
  */
 function renderMediaFrame_(url) {
   if (!url) return '';
+  // [PERBAIKAN v5] Proxy video milik Apps Script sendiri (dipakai sebagai cadangan saat
+  // sharing Drive ditolak kebijakan organisasi — lihat Media.gs). Video asli, bisa
+  // diputar native, hanya TANPA dukungan seek/buffer sebaik iframe Drive resmi.
+  if (/[?&]action=media/.test(url) && /[?&]tipe=video/.test(url)) {
+    return `<video controls preload="metadata" style="width:100%;height:100%;background:#000;"><source src="${url}">Video tidak dapat diputar di browser ini.</video>`;
+  }
+  // Iframe /preview resmi Drive (pengalaman terbaik, butuh sharing publik aktif).
   if (/drive\.google\.com\/file\/.+\/preview/.test(url)) {
     return `<iframe src="${url}" style="width:100%;height:100%;border:0;" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
   }
+  // YouTube — terima link watch, youtu.be, maupun yang sudah berformat embed.
   if (/youtube\.com|youtu\.be/.test(url)) {
-    const embedUrl = url.replace('watch?v=', 'embed/');
+    const embedUrl = normalisasiUrlYoutube_(url);
     return `<iframe src="${embedUrl}" style="width:100%;height:100%;border:0;" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
   }
+  // Tautan Drive mentah yang DITEMPEL MANUAL oleh admin (bukan hasil upload) —
+  // ".../file/d/ID/view" atau ".../open?id=ID" — otomatis dikonversi ke /preview
+  // agar tetap bisa tampil sebagai embed, bukan link mati.
+  const idDriveManual = ekstrakIdDrive_(url);
+  if (idDriveManual) {
+    return `<iframe src="https://drive.google.com/file/d/${idDriveManual}/preview" style="width:100%;height:100%;border:0;" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
+  }
+  // Default: gambar biasa (proxy gambar milik sendiri, thumbnail Drive, atau URL gambar umum lain).
   return `<img src="${url}" alt="" loading="lazy">`;
+}
+
+// [ADDITIVE v5] Ubah berbagai bentuk link Drive (view/open/edit) jadi link /preview
+// yang bisa disematkan via <iframe>. Dipakai untuk link yang DITEMPEL MANUAL, karena
+// hasil upload kita sendiri SUDAH otomatis dalam format yang benar (lihat Media.gs).
+function ekstrakIdDrive_(url) {
+  const m = url.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)([A-Za-z0-9_-]{15,})/);
+  return m ? m[1] : null;
+}
+
+function normalisasiUrlYoutube_(url) {
+  if (url.indexOf('embed/') !== -1) return url;
+  const mWatch = url.match(/[?&]v=([A-Za-z0-9_-]{6,})/);
+  if (mWatch) return 'https://www.youtube.com/embed/' + mWatch[1];
+  const mShort = url.match(/youtu\.be\/([A-Za-z0-9_-]{6,})/);
+  if (mShort) return 'https://www.youtube.com/embed/' + mShort[1];
+  return url;
 }
 
 /**

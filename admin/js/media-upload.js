@@ -17,12 +17,23 @@
  */
 // Duplikasi kecil yang disengaja dari frontend/js/shared.js (konteks admin
 // terpisah dari frontend publik, lebih aman daripada membuat admin.js
-// bergantung ke folder publik). Logikanya harus selalu sama persis.
+// bergantung ke folder publik). Logikanya harus selalu sama persis — lihat
+// shared.js untuk komentar lengkap soal kenapa tiap cabang ada.
 function renderMediaFrame_(url) {
   if (!url) return '';
+  if (/[?&]action=media/.test(url) && /[?&]tipe=video/.test(url)) {
+    return `<video controls preload="metadata" style="width:100%;height:100%;background:#000;"><source src="${url}"></video>`;
+  }
   if (/drive\.google\.com\/file\/.+\/preview/.test(url)) {
     return `<iframe src="${url}" style="width:100%;height:100%;border:0;" allow="autoplay" allowfullscreen></iframe>`;
   }
+  if (/youtube\.com|youtu\.be/.test(url)) {
+    const m = url.match(/[?&]v=([A-Za-z0-9_-]{6,})/) || url.match(/youtu\.be\/([A-Za-z0-9_-]{6,})/);
+    const embedUrl = m ? 'https://www.youtube.com/embed/' + m[1] : url;
+    return `<iframe src="${embedUrl}" style="width:100%;height:100%;border:0;" allow="autoplay" allowfullscreen></iframe>`;
+  }
+  const idDrive = (url.match(/drive\.google\.com\/(?:file\/d\/|open\?id=|uc\?id=)([A-Za-z0-9_-]{15,})/) || [])[1];
+  if (idDrive) return `<iframe src="https://drive.google.com/file/d/${idDrive}/preview" style="width:100%;height:100%;border:0;" allow="autoplay" allowfullscreen></iframe>`;
   return `<img src="${url}" alt="" style="width:100%;height:100%;object-fit:contain;">`;
 }
 
@@ -133,7 +144,7 @@ function initMediaUpload(containerId, opts) {
       // [PERBAIKAN BUG — audit lapangan] deteksi berbasis ekstensi file gagal untuk
       // URL video Drive (`.../preview`, tanpa ekstensi sama sekali) — tambahkan
       // deteksi pola URL preview Drive sebagai video juga.
-      const adalahVideo = /\.(mp4|webm|mov)(\?|$)/i.test(urlAwal) || /drive\.google\.com\/file\/.+\/preview/.test(urlAwal);
+      const adalahVideo = /\.(mp4|webm|mov)(\?|$)/i.test(urlAwal) || /drive\.google\.com\/file\/.+\/preview/.test(urlAwal) || (/[?&]action=media/.test(urlAwal) && /[?&]tipe=video/.test(urlAwal));
       items = [{ url: urlAwal, jenis: adalahVideo ? 'video' : 'gambar' }];
       renderPreview();
     },
