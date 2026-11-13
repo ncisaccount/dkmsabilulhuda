@@ -4,10 +4,14 @@
  * sesuai mitigasi kuota GAS di PRD Bagian 6.
  */
 const NAMA_SALAT = { subuh: 'Subuh', zuhur: 'Dzuhur', ashar: 'Ashar', maghrib: 'Maghrib', isya: 'Isya' };
-const URUTAN_SALAT = ['subuh', 'zuhur', 'ashar', 'maghrib', 'isya'];
-// [ADDITIVE v2 — Modul 03] waktu tambahan (imsak/terbit/dhuha) ditampilkan terpisah,
-// tidak ikut dihitung dalam countdown "menuju waktu salat wajib berikutnya" di atas.
-const NAMA_SALAT_TAMBAHAN = { imsak: 'Imsak', terbit: 'Terbit', dhuha: 'Dhuha' };
+const URUTAN_SALAT = ['subuh', 'zuhur', 'ashar', 'maghrib', 'isya']; // 5 waktu wajib — dasar perhitungan countdown
+// [REDESIGN v6] Label & ikon untuk SEMUA 8 slot waktu (termasuk imsak/terbit/dhuha
+// yang hanya informatif, tidak ikut dihitung countdown waktu wajib di atas).
+const URUTAN_TAMPIL_SALAT = ['imsak', 'subuh', 'terbit', 'dhuha', 'zuhur', 'ashar', 'maghrib', 'isya'];
+const NAMA_SALAT_LENGKAP = { imsak: 'Imsak', subuh: 'Subuh', terbit: 'Terbit', dhuha: 'Dhuha', zuhur: 'Dzuhur', ashar: 'Ashar', maghrib: 'Maghrib', isya: 'Isya' };
+const IKON_SALAT = { imsak: '🌙', subuh: '🌅', terbit: '🌄', dhuha: '🔆', zuhur: '☀️', ashar: '🌤️', maghrib: '🌇', isya: '🌌' };
+let JADWAL_SALAT_AKTIF = null; // disimpan agar countdown bisa diperbarui tiap detik tanpa fetch ulang
+let TIMER_COUNTDOWN_SALAT = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
   initThemeToggle();
@@ -43,59 +47,89 @@ function renderPengaturan(list) {
   terapkanPengaturanUmum_(list); // [ADDITIVE v2 — Modul 05] logika logo/data-setting kini terpusat di shared.js
 }
 
+/**
+ * [REDESIGN v6] Render kartu jadwal — SEMUA 8 slot waktu (imsak..isya) sekali
+ * render, lalu serahkan countdown & highlight ke perbaruiHighlightCountdown_()
+ * yang di-tick tiap detik via setInterval (Live Prayer Countdown, zona waktu
+ * mengikuti jam perangkat pengunjung; data jadwal sendiri sudah dalam WIB).
+ */
 function renderJadwalSalat(jadwal) {
   const wrap = document.getElementById('jadwal-salat-list');
   if (!wrap) return;
+  JADWAL_SALAT_AKTIF = jadwal;
+
   const tgl = document.getElementById('tanggal-hari-ini');
   if (tgl) {
     const hari = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'][new Date().getDay()];
     tgl.textContent = `${hari}, ${formatTanggalIndo(new Date().toISOString())}`;
   }
-  const sekarang = new Date();
-  const menitSekarang = sekarang.getHours() * 60 + sekarang.getMinutes();
 
-  let waktuNext = null, selisihMin = Infinity;
-  const rows = URUTAN_SALAT.map(key => {
-    const [h, m] = String(jadwal[key] || '00:00').split(':').map(Number);
-    const menit = h * 60 + m;
-    let delta = menit - menitSekarang;
-    if (delta < 0) delta += 24 * 60; // sudah lewat -> hitung ke besok
-    if (delta < selisihMin) { selisihMin = delta; waktuNext = key; }
-    return { key, label: NAMA_SALAT[key], jam: jadwal[key] };
-  });
+  const slotTersedia = URUTAN_TAMPIL_SALAT.filter(k => jadwal[k]);
+  if (!slotTersedia.length) { wrap.innerHTML = '<div class="empty-state" style="grid-column:1/-1;">Jadwal salat belum tersedia. Administrator perlu menjalankan sinkronisasi di Pengaturan Situs.</div>'; return; }
 
-  wrap.innerHTML = rows.map(r => `
-    <div class="prayer-row ${r.key === waktuNext ? 'active' : ''}">
-      <span>${r.label}</span>
-      <span class="time">${r.jam}</span>
+  wrap.innerHTML = slotTersedia.map(k => `
+    <div class="prayer-row ${URUTAN_SALAT.includes(k) ? 'utama' : ''}" data-key="${k}">
+      <span class="ic" aria-hidden="true">${IKON_SALAT[k] || ''}</span>
+      <span class="nama">${NAMA_SALAT_LENGKAP[k]}</span>
+      <span class="time">${jadwal[k]}</span>
     </div>`).join('');
 
-  const jam = Math.floor(selisihMin / 60), menit = selisihMin % 60;
-  const countdown = document.getElementById('prayer-countdown');
-  if (countdown) countdown.textContent = `Menuju ${NAMA_SALAT[waktuNext]} ± ${jam}j ${menit}m lagi`;
-
-  // [ADDITIVE v2 — Modul 03] tampilkan Imsak/Terbit/Dhuha (jika sudah tersinkron)
-  // dan tanggal Hijriah, TANPA mengubah logika countdown waktu wajib di atas.
-  const tambahan = Object.keys(NAMA_SALAT_TAMBAHAN).filter(k => jadwal[k]);
-  if (tambahan.length) {
-    wrap.insertAdjacentHTML('afterbegin', tambahan.map(k => `
-      <div class="prayer-row" style="opacity:.75;font-size:13px;"><span>${NAMA_SALAT_TAMBAHAN[k]}</span><span class="time">${jadwal[k]}</span></div>`).join(''));
-  }
   const hijriahEl = document.getElementById('jadwal-hijriah');
-  if (hijriahEl && jadwal.hijriah) hijriahEl.textContent = jadwal.hijriah;
+  if (hijriahEl) hijriahEl.textContent = jadwal.hijriah ? ('📆 ' + jadwal.hijriah) : '📆 Tanggal Hijriah belum tersedia (menunggu sinkronisasi pertama).';
+
+  perbaruiHighlightCountdown_(); // render pertama langsung, tidak menunggu tick 1 detik
+  if (TIMER_COUNTDOWN_SALAT) clearInterval(TIMER_COUNTDOWN_SALAT);
+  TIMER_COUNTDOWN_SALAT = setInterval(perbaruiHighlightCountdown_, 1000);
+}
+
+/**
+ * [REDESIGN v6 — Live Prayer Countdown & Dynamic Highlight] Dipanggil tiap
+ * detik. TIDAK fetch ulang data — murni menghitung ulang dari jam perangkat
+ * saat ini terhadap JADWAL_SALAT_AKTIF yang sudah tersimpan di memori.
+ */
+function perbaruiHighlightCountdown_() {
+  if (!JADWAL_SALAT_AKTIF) return;
+  const jadwal = JADWAL_SALAT_AKTIF;
+  const sekarang = new Date();
+  const detikSekarang = sekarang.getHours() * 3600 + sekarang.getMinutes() * 60 + sekarang.getSeconds();
+
+  let waktuNext = null, selisihDetik = Infinity;
+  URUTAN_SALAT.forEach(key => {
+    if (!jadwal[key]) return;
+    const [h, m] = String(jadwal[key]).split(':').map(Number);
+    let delta = (h * 3600 + m * 60) - detikSekarang;
+    if (delta <= 0) delta += 24 * 3600; // sudah lewat hari ini -> hitung ke besok
+    if (delta < selisihDetik) { selisihDetik = delta; waktuNext = key; }
+  });
+
+  document.querySelectorAll('#jadwal-salat-list .prayer-row').forEach(el => {
+    el.classList.toggle('active', el.getAttribute('data-key') === waktuNext);
+  });
+
+  const countdown = document.getElementById('prayer-countdown');
+  if (!countdown) return;
+  if (!waktuNext) { countdown.textContent = 'Jadwal waktu wajib belum lengkap untuk hari ini.'; return; }
+  const jam = Math.floor(selisihDetik / 3600);
+  const menit = Math.floor((selisihDetik % 3600) / 60);
+  const detik = selisihDetik % 60;
+  countdown.textContent = `🕐 Menuju ${NAMA_SALAT[waktuNext]} • ${String(jam).padStart(2,'0')}:${String(menit).padStart(2,'0')}:${String(detik).padStart(2,'0')}`;
 }
 
 function renderInfoSinkronJadwal(info) {
   const el = document.getElementById('jadwal-sinkron-info');
   if (!el) return;
+  // [REDESIGN v6] Kejujuran status WAJIB dijaga: tidak pernah menampilkan kesan
+  // "berhasil" jika percobaan sinkron terakhir sebenarnya gagal.
+  const gagal = !!info.sinkronGagalTerakhir;
+  el.classList.toggle('gagal', gagal);
+  let teks;
   if (info.sinkronTerakhir) {
-    el.textContent = 'Data Kemenag via myquran.com • sinkron terakhir: ' + formatTanggalIndo(info.sinkronTerakhir);
+    teks = 'Data Kemenag via myquran.com • sinkron terakhir: ' + formatTanggalIndo(info.sinkronTerakhir);
   } else {
-    el.textContent = 'Jadwal belum pernah disinkronkan otomatis — hubungi Administrator.';
+    teks = 'Jadwal belum pernah disinkronkan otomatis — hubungi Administrator.';
   }
-  if (info.sinkronGagalTerakhir) {
-    el.textContent += ' ⚠️ Percobaan sinkron terakhir gagal, menampilkan data valid terakhir.';
-  }
+  if (gagal) teks += ' ⚠️ Percobaan sinkron terbaru sempat gagal, menampilkan data valid terakhir.';
+  el.innerHTML = `<span class="dot"></span><span>${teks}</span>`;
 }
 
 function renderBerita(list) {

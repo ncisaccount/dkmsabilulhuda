@@ -106,32 +106,112 @@ p { color: var(--text-muted); }
   .nav-toggle { display: block; }
 }
 
-/* --- Hero --- */
-.hero {
-  position: relative; color: #fff; padding: 5rem 0 7rem; overflow: hidden;
-  background: linear-gradient(180deg, rgba(11,38,31,.55), rgba(11,38,31,.88)), var(--hero-img, linear-gradient(135deg,#123D32,#0B261F));
-  background-size: cover; background-position: center;
-}
-.hero .container { display: grid; grid-template-columns: 1.3fr 1fr; gap: 2rem; align-items: start; }
-.badge { display: inline-block; background: rgba(255,255,255,.12); padding: 6px 14px; border-radius: var(--radius-full); font-size: 13px; margin-bottom: 1rem; }
-.hero h1 { color: #fff; font-size: 48px; line-height: 1.1; margin-bottom: .4rem; }
-.hero .tagline { font-family: var(--font-heading); font-style: italic; color: var(--gold); font-size: 20px; margin-bottom: 1rem; }
-.hero p.lead { color: #d8e4de; max-width: 480px; margin-bottom: 1.6rem; }
-.hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
-@media (max-width: 900px) {
-  .hero .container { grid-template-columns: 1fr; }
-  .hero h1 { font-size: 32px; }
+/* ============================================================================
+   [REDESIGN v6] HERO SECTION — Modern Islamic Premium / Elegant Mosque Experience
+   Palet diperkaya khusus Hero & kartu jadwal (tidak mengganti token --primary/
+   --gold global yang dipakai di seluruh halaman lain — aditif, tidak merusak).
+   ============================================================================ */
+:root {
+  --hero-emerald-deep: #0B3027;
+  --hero-dark-green: #103F33;
+  --hero-forest-green: #174B3D;
+  --hero-gold: #DDB65F;
+  --hero-soft-gold: #E8C77E;
+  --hero-soft-bg: #F5F8F5;
 }
 
-/* --- Prayer widget --- */
-.prayer-card { background: var(--surface-white); border-radius: var(--radius-md); border: 1px solid var(--gold-border); box-shadow: var(--shadow-float); overflow: hidden; }
-.prayer-card-header { background: var(--primary); color: #fff; padding: 1rem 1.25rem; display: flex; justify-content: space-between; align-items: center; }
-.prayer-card-header small { display: block; color: #cde3da; font-size: 11px; }
-.prayer-row { display: flex; justify-content: space-between; align-items: center; padding: .7rem 1.25rem; border-bottom: 1px solid var(--outline); font-weight: 500; color: var(--text-dark); }
-.prayer-row:last-of-type { border-bottom: none; }
-.prayer-row.active { background: var(--prayer-active); font-weight: 700; color: var(--primary); }
-.prayer-row .time { font-weight: 700; }
-.prayer-countdown { background: var(--primary); color: var(--gold); text-align: center; padding: .6rem; font-size: 13px; font-weight: 600; }
+.hero {
+  position: relative; color: #fff; padding: 5.5rem 0 8rem; overflow: hidden;
+  background: linear-gradient(135deg, var(--hero-emerald-deep), var(--hero-dark-green) 55%, var(--hero-forest-green));
+  isolation: isolate;
+}
+/* Pola geometris Islami (motif bintang 8 — girih) beropasitas rendah, murni
+   CSS/SVG — BUKAN foto, sesuai larangan memakai gambar masjid generik yang
+   bisa dikira dokumentasi asli. Dekoratif saja, tidak mengganggu keterbacaan. */
+.hero::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; opacity: .08; pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Cg fill='none' stroke='%23E8C77E' stroke-width='1.2'%3E%3Cpath d='M60 10 L80 30 L110 30 L90 50 L110 70 L80 70 L60 90 L40 70 L10 70 L30 50 L10 30 L40 30 Z'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+.hero::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(ellipse at 85% 15%, rgba(232,199,126,.14), transparent 55%);
+}
+.hero .container { display: grid; grid-template-columns: 1.15fr 1fr; gap: 3rem; align-items: center; position: relative; }
+
+.hero-eyebrow {
+  display: inline-block; font-family: var(--font-body); font-size: 12px; font-weight: 700;
+  letter-spacing: .08em; color: var(--hero-soft-gold); text-transform: uppercase;
+  padding: 7px 16px; border: 1px solid rgba(232,199,126,.35); border-radius: var(--radius-full);
+  background: rgba(232,199,126,.08); margin-bottom: 1.3rem;
+}
+.hero h1 { color: #fff; font-size: 52px; line-height: 1.08; margin-bottom: .5rem; letter-spacing: -.01em; }
+.hero .tagline { font-family: var(--font-heading); font-style: italic; color: var(--hero-soft-gold); font-size: 21px; margin-bottom: 1.1rem; }
+.hero p.lead { color: #d8e4de; max-width: 500px; margin-bottom: 1.8rem; font-size: 15.5px; }
+.hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+.hero-actions .btn { transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
+.hero-actions .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 24px -6px rgba(0,0,0,.35); }
+.hero-actions .btn:focus-visible { outline: 2px solid var(--hero-soft-gold); outline-offset: 3px; }
+
+/* Entrance halus — dinonaktifkan otomatis untuk prefers-reduced-motion (lihat akhir file). */
+.hero-fade-in { opacity: 0; transform: translateY(14px); animation: heroFadeIn .7s ease forwards; }
+.hero-fade-in.d1 { animation-delay: .05s; } .hero-fade-in.d2 { animation-delay: .15s; }
+.hero-fade-in.d3 { animation-delay: .25s; } .hero-fade-in.d4 { animation-delay: .35s; }
+@keyframes heroFadeIn { to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 900px) {
+  .hero { padding: 3rem 0 4.5rem; }
+  .hero .container { grid-template-columns: 1fr; gap: 2rem; }
+  .hero h1 { font-size: 34px; }
+  .hero .tagline { font-size: 17px; }
+}
+
+/* --- Prayer widget [REDESIGN v6] --- */
+.prayer-card {
+  background: var(--surface-white); border-radius: 20px; border: 1px solid rgba(232,199,126,.25);
+  box-shadow: 0 24px 60px -12px rgba(0,0,0,.35); overflow: hidden;
+}
+.prayer-card-header {
+  background: linear-gradient(135deg, var(--hero-emerald-deep), var(--hero-dark-green));
+  color: #fff; padding: 1.1rem 1.3rem; display: flex; justify-content: space-between; align-items: center;
+  position: relative;
+}
+.prayer-card-header strong { font-family: var(--font-heading); font-size: 16px; }
+.prayer-card-header small { display: block; color: var(--hero-soft-gold); font-size: 11px; margin-top: 2px; }
+.prayer-hijriah-row {
+  display: flex; justify-content: space-between; align-items: center; padding: .5rem 1.3rem;
+  background: rgba(232,199,126,.08); font-size: 11.5px; color: var(--text-muted); border-bottom: 1px solid var(--outline);
+}
+.prayer-grid { display: grid; grid-template-columns: 1fr 1fr; }
+.prayer-row {
+  display: flex; align-items: center; gap: .6rem; padding: .65rem 1.1rem;
+  border-bottom: 1px solid var(--outline); border-right: 1px solid var(--outline);
+  font-weight: 500; color: var(--text-dark); font-size: 13.5px;
+}
+.prayer-row .ic { font-size: 14px; opacity: .75; }
+.prayer-row .nama { flex: 1; }
+.prayer-row .time { font-weight: 700; font-variant-numeric: tabular-nums; }
+.prayer-row.utama { font-size: 14.5px; padding: .8rem 1.1rem; }
+.prayer-row.active {
+  background: linear-gradient(90deg, var(--prayer-active), transparent);
+  font-weight: 700; color: var(--hero-forest-green); position: relative;
+}
+.prayer-row.active::before { content:""; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--hero-gold); }
+.prayer-countdown {
+  background: linear-gradient(135deg, var(--hero-emerald-deep), var(--hero-dark-green));
+  color: var(--hero-soft-gold); text-align: center; padding: .8rem; font-size: 13.5px; font-weight: 700;
+  letter-spacing: .01em; font-variant-numeric: tabular-nums;
+}
+.prayer-sync-info {
+  display: flex; align-items: center; justify-content: center; gap: 5px;
+  font-size: 10.5px; color: var(--text-muted); text-align: center; padding: 6px; background: var(--surface-container);
+}
+.prayer-sync-info .dot { width: 6px; height: 6px; border-radius: 50%; background: #2a9d5c; flex-shrink: 0; }
+.prayer-sync-info.gagal .dot { background: var(--hero-gold); }
+@media (max-width: 500px) {
+  .prayer-grid { grid-template-columns: 1fr; }
+  .prayer-row { border-right: none; }
+}
 
 /* --- Quick access --- */
 .quick-access { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1rem; margin-top: -3.5rem; position: relative; z-index: 5; }
@@ -182,6 +262,15 @@ footer.site-footer a:hover { color: var(--gold); }
 @keyframes shimmer { 0% { background-position: 100% 50%; } 100% { background-position: 0 50%; } }
 
 .empty-state { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 14px; }
+
+/* [REDESIGN v6 — Aksesibilitas] Hormati preferensi pengguna yang mengurangi
+   gerakan — semua animasi hero/entrance langsung ditiadakan, konten tetap
+   tampil penuh (opacity:1) tanpa harus menunggu animasi selesai. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-fade-in { animation: none !important; opacity: 1 !important; transform: none !important; }
+  .hero-actions .btn:hover { transform: none; }
+  * { scroll-behavior: auto !important; }
+}
 
 /* ============================================================================
    [ADDITIVE v2] MODUL 02 — Media Display & Responsive Frame

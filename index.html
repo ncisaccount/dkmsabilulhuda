@@ -42,35 +42,38 @@
   </div>
 </nav>
 
-<header class="hero">
+<header class="hero" id="beranda-hero">
   <div class="container">
     <div>
-      <div class="badge">Selamat Datang di</div>
-      <h1>Masjid <span data-setting="nama_masjid">Sabilul Huda</span></h1>
-      <p class="tagline" data-setting="tagline">Pusat Informasi, Dakwah, dan Pelayanan Umat</p>
-      <p class="lead">Mari bersama memakmurkan masjid dengan ilmu, ibadah, dan kebaikan untuk membangun generasi umat yang berakhlak mulia.</p>
-      <div class="hero-actions">
+      <div class="hero-eyebrow hero-fade-in d1">Assalamualaikum Warahmatullahi Wabarakatuh</div>
+      <h1 class="hero-fade-in d2">Masjid <span data-setting="nama_masjid">Sabilul Huda</span></h1>
+      <p class="tagline hero-fade-in d2" data-setting="tagline">Pusat Informasi, Dakwah, dan Pelayanan Umat</p>
+      <p class="lead hero-fade-in d3">Menjadi pusat ibadah, ilmu pengetahuan, dakwah, dan pelayanan umat untuk membangun masyarakat yang religius, harmonis, dan berakhlak mulia.</p>
+      <div class="hero-actions hero-fade-in d4">
         <a href="profil.html" class="btn btn-gold">Jelajahi Informasi Masjid →</a>
-        <a href="galeri.html" class="btn-ghost btn" style="color:#fff;border-color:rgba(255,255,255,.5);">▶ Profil Masjid</a>
+        <a href="profil.html" class="btn-ghost btn" style="color:#fff;border-color:rgba(255,255,255,.5);">Kenali Masjid Kami →</a>
       </div>
     </div>
 
-    <div class="prayer-card" data-skeleton>
+    <div class="prayer-card hero-fade-in d4" data-skeleton aria-label="Widget jadwal salat hari ini">
       <div class="prayer-card-header">
         <div>
-          <strong>Jadwal Salat Hari Ini</strong>
-          <small id="tanggal-hari-ini"></small>
+          <strong>🕌 Jadwal Salat Hari Ini</strong>
+          <small id="tanggal-hari-ini">Memuat tanggal…</small>
         </div>
-        <span>📅</span>
+        <span aria-hidden="true">📅</span>
       </div>
-      <div id="jadwal-hijriah" style="padding:.4rem 1.25rem 0;font-size:12px;color:var(--text-muted);"></div>
-      <div id="jadwal-salat-list">
+      <div class="prayer-hijriah-row">
+        <span id="jadwal-hijriah">Tanggal Hijriah dimuat setelah sinkron…</span>
+      </div>
+      <div id="jadwal-salat-list" class="prayer-grid">
+        <div class="prayer-row skeleton" style="height:40px;margin:8px;border:none;"></div>
         <div class="prayer-row skeleton" style="height:40px;margin:8px;border:none;"></div>
         <div class="prayer-row skeleton" style="height:40px;margin:8px;border:none;"></div>
         <div class="prayer-row skeleton" style="height:40px;margin:8px;border:none;"></div>
       </div>
-      <div class="prayer-countdown" id="prayer-countdown">Memuat jadwal salat…</div>
-      <div id="jadwal-sinkron-info" style="font-size:10px;color:var(--text-muted);text-align:center;padding:4px;"></div>
+      <div class="prayer-countdown" id="prayer-countdown" role="status" aria-live="polite">Memuat jadwal salat…</div>
+      <div id="jadwal-sinkron-info" class="prayer-sync-info"><span class="dot"></span><span>Memeriksa status sinkronisasi…</span></div>
     </div>
   </div>
 </header>
