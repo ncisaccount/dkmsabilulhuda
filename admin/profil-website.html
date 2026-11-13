@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Edit Profil Website — Portal DKM Admin</title>
+<link rel="icon" href="data:,">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="css/admin.css">
+<style>
+  .pw-field { margin-bottom: 1rem; }
+  .pw-field label { display:block; font-size:13px; font-weight:600; margin-bottom:.3rem; }
+  .pw-field input, .pw-field textarea { width:100%; padding:9px 12px; border-radius:8px; border:1.5px solid var(--outline); font-family:var(--font-body); }
+  .pw-misi-card { border:1px solid var(--outline); border-radius:10px; padding:1rem; margin-bottom:.8rem; background:var(--surface-container); }
+</style>
+</head>
+<body class="admin-body">
+<div class="admin-shell">
+  <aside class="admin-sidebar">
+    <div class="brand" style="display:flex;align-items:center;gap:.6rem;">
+      <img id="admin-logo-img" src="" alt="Logo" style="display:none;height:34px;width:34px;object-fit:contain;border-radius:6px;background:#fff;">
+      <span id="admin-logo-text">Sabilul Huda<small>PORTAL DKM ADMIN</small></span>
+    </div>
+    <nav class="admin-nav" id="admin-nav"></nav>
+  </aside>
+
+  <main class="admin-main">
+    <div class="admin-topbar">
+      <div><h1>Edit Profil Website</h1><p style="margin:0;font-size:13px;color:var(--text-muted);">Ubah narasi Sejarah, Visi, Misi, dan statistik yang tampil di halaman Profil publik — tanpa perlu menyentuh kode.</p></div>
+      <div class="admin-user" id="admin-user-box"></div>
+    </div>
+
+    <div class="admin-card" style="max-width:720px;">
+      <h3 style="margin-top:0;">📖 Sejarah Singkat Pembangunan</h3>
+      <div class="pw-field"><label>Isi Sejarah (tampil sebagai 1 paragraf di halaman Profil)</label><textarea name="profil_sejarah" rows="5"></textarea></div>
+
+      <h3>📊 Statistik Ringkas (4 angka di bawah Sejarah)</h3>
+      <div class="grid grid-2">
+        <div class="pw-field"><label>Angka 1 — Daya Tampung Jamaah</label><input type="text" name="profil_stat_jamaah" placeholder="2.500+"></div>
+        <div class="pw-field"><label>Angka 2 — Luas Tanah &amp; Bangunan</label><input type="text" name="profil_stat_luas" placeholder="3.200 m²"></div>
+        <div class="pw-field"><label>Angka 3 — Layanan Aktif ZISWAF</label><input type="text" name="profil_stat_program" placeholder="18 Program"></div>
+        <div class="pw-field"><label>Angka 4 — Tahun Pendirian</label><input type="text" name="profil_stat_tahun" placeholder="1998 M"></div>
+      </div>
+
+      <h3>🕊 Visi Utama</h3>
+      <div class="pw-field"><label>Kalimat Visi</label><textarea name="profil_visi" rows="2"></textarea></div>
+    </div>
+
+    <div class="admin-card" style="max-width:720px;">
+      <h3 style="margin-top:0;">🎯 4 Pilar Misi DKM</h3>
+      <div id="misi-wrap"></div>
+    </div>
+
+    <button class="btn btn-primary" id="btn-simpan" style="margin-bottom:2rem;">💾 Simpan Profil Website</button>
+    <p id="status-msg" style="font-size:13px;"></p>
+  </main>
+</div>
+
+<script src="../js/config.js"></script>
+<script src="../js/api.js"></script>
+<script src="js/admin.js"></script>
+<script>
+const JUDUL_MISI_DEFAULT = ['Syiar Ibadah', 'Pendidikan', 'Ekonomi Umat', 'Tata Kelola Digital'];
+const ISI_MISI_DEFAULT = [
+  'Ketertiban salat & keterampilan beribadah jamaah.',
+  "Kajian Qur'an, majelis ilmu, ruang kreatif remaja (RISMA).",
+  'Zakat, Infaq, Sedekah, dan Wakaf (ZISWAF) bagi mustahik.',
+  'Transparansi keuangan & informasi dakwah berbasis digital.'
+];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const user = guardAdmin_();
+  if (!user) return;
+  if (user.peran !== 'admin') { document.querySelector('main').innerHTML = '<div class="empty-state">Halaman ini khusus untuk Administrator.</div>'; return; }
+  renderSidebar_('profil-website.html');
+
+  // Render 4 kartu misi (judul + isi) secara dinamis.
+  const wrap = document.getElementById('misi-wrap');
+  wrap.innerHTML = [0,1,2,3].map(i => `
+    <div class="pw-misi-card">
+      <strong>Pilar ${i+1}</strong>
+      <div class="pw-field" style="margin-top:.5rem;"><label>Judul</label><input type="text" name="profil_misi${i+1}_judul" placeholder="${JUDUL_MISI_DEFAULT[i]}"></div>
+      <div class="pw-field" style="margin-bottom:0;"><label>Deskripsi</label><textarea name="profil_misi${i+1}_isi" rows="2" placeholder="${ISI_MISI_DEFAULT[i]}"></textarea></div>
+    </div>`).join('');
+
+  const res = await Api.get('adminPengaturan', { token: Auth.getToken() });
+  const form = document.querySelector('main');
+  if (res.success) {
+    res.data.forEach(r => { const el = form.querySelector(`[name="${r.key}"]`); if (el) el.value = r.value; });
+  }
+
+  document.getElementById('btn-simpan').addEventListener('click', async () => {
+    const status = document.getElementById('status-msg');
+    const data = {};
+    form.querySelectorAll('input[name], textarea[name]').forEach(el => { data[el.name] = el.value; });
+    status.textContent = 'Menyimpan…'; status.style.color = 'var(--text-muted)';
+    const r = await Api.post('simpanPengaturan', { data });
+    status.textContent = r.success ? '✅ Profil Website berhasil disimpan & langsung tampil di halaman Profil publik.' : '⚠️ ' + r.message;
+    status.style.color = r.success ? 'green' : 'var(--error)';
+  });
+});
+</script>
+</body>
+</html>

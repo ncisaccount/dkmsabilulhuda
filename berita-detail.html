@@ -72,8 +72,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     <span class="tag">${b.kategori || 'Berita'}</span>
     <h1>${b.judul}</h1>
     <p class="meta">📅 ${formatTanggalIndo(b.tanggal)} &nbsp;•&nbsp; ✍️ ${b.penulis || 'Redaksi DKM'}</p>
-    ${b.gambar ? `<div class="media-frame media-frame--16x9 article-cover"><img src="${b.gambar}" alt="${b.judul}"></div>` : ''}
-    <div class="article-body">${(b.isi || '').split('\\n').filter(x=>x.trim()).map(p => `<p>${p}</p>`).join('')}</div>
+    ${b.gambar ? `<div class="media-frame media-frame--16x9 article-cover">${renderMediaFrame_(b.gambar)}</div>` : ''}
+    <div class="article-body">${formatIsiBerita_(b.isi)}</div>
     <div class="author-box">
       <div class="ph"></div>
       <div><strong>${b.penulis || 'Redaksi DKM'}</strong><p style="margin:0;font-size:13px;">Tim Media &amp; Humas DKM Sabilul Huda</p></div>

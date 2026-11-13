@@ -15,6 +15,17 @@
  *   </script>
  * ============================================================================
  */
+// Duplikasi kecil yang disengaja dari frontend/js/shared.js (konteks admin
+// terpisah dari frontend publik, lebih aman daripada membuat admin.js
+// bergantung ke folder publik). Logikanya harus selalu sama persis.
+function renderMediaFrame_(url) {
+  if (!url) return '';
+  if (/drive\.google\.com\/file\/.+\/preview/.test(url)) {
+    return `<iframe src="${url}" style="width:100%;height:100%;border:0;" allow="autoplay" allowfullscreen></iframe>`;
+  }
+  return `<img src="${url}" alt="" style="width:100%;height:100%;object-fit:contain;">`;
+}
+
 function initMediaUpload(containerId, opts) {
   opts = Object.assign({ kategori: 'lainnya', multiple: false, accept: 'image/*,video/mp4,video/webm' }, opts || {});
   const root = document.getElementById(containerId);
@@ -96,7 +107,11 @@ function initMediaUpload(containerId, opts) {
     if (!items.length) { previewList.innerHTML = ''; return; }
     previewList.innerHTML = items.map((it, i) => `
       <div class="mu-preview-item">
-        ${it.jenis === 'video' ? `<video src="${it.previewLocal || it.url}" muted></video>` : `<img src="${it.previewLocal || it.url}" alt="">`}
+        ${it.previewLocal
+          ? (it.jenis === 'video' ? `<video src="${it.previewLocal}" muted></video>` : `<img src="${it.previewLocal}" alt="">`)
+          // Berkas yang SUDAH tersimpan di Drive: video pakai iframe /preview resmi
+          // (lihat catatan Media.gs), bukan <video src> yang tidak andal untuk Drive.
+          : `<div style="width:100%;height:70px;">${renderMediaFrame_(it.url)}</div>`}
         <div class="mu-preview-info">
           <span style="font-size:12px;">${it.namaFile || it.url || ''}</span>
           ${it.uploading ? `<div class="mu-progress"><div class="mu-progress-bar" style="width:${it.progress}%;"></div></div>` : ''}
@@ -115,7 +130,11 @@ function initMediaUpload(containerId, opts) {
     },
     setValue(urlAwal) {
       if (!urlAwal) return;
-      items = [{ url: urlAwal, jenis: /\.(mp4|webm|mov)(\?|$)/i.test(urlAwal) ? 'video' : 'gambar' }];
+      // [PERBAIKAN BUG — audit lapangan] deteksi berbasis ekstensi file gagal untuk
+      // URL video Drive (`.../preview`, tanpa ekstensi sama sekali) — tambahkan
+      // deteksi pola URL preview Drive sebagai video juga.
+      const adalahVideo = /\.(mp4|webm|mov)(\?|$)/i.test(urlAwal) || /drive\.google\.com\/file\/.+\/preview/.test(urlAwal);
+      items = [{ url: urlAwal, jenis: adalahVideo ? 'video' : 'gambar' }];
       renderPreview();
     },
     isUploading() { return items.some(it => it.uploading); }

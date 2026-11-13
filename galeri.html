@@ -110,11 +110,21 @@ function render() {
   if (state.q) data = data.filter(g => JSON.stringify(g).toLowerCase().includes(state.q));
   const wrap = document.getElementById('gal-grid');
   if (!data.length) { wrap.innerHTML = '<div class="empty-state">Belum ada dokumentasi untuk filter ini.</div>'; return; }
-  wrap.innerHTML = data.map((g,i) => `
-    <div class="gal-item" style="background-image:url('${g.tautan||''}')" data-i="${i}">
-      ${g.jenis === 'video' ? '<span class="play">▶ Video</span>' : ''}
+  // [ADDITIVE v2 — koreksi audit] thumbnail video Drive tidak bisa dipakai sebagai
+  // background-image (hasil /preview adalah halaman, bukan file gambar), jadi thumbnail
+  // grid untuk video memakai kotak gelap + ikon putar; foto tetap background-image cover.
+  // Jika tautan KOSONG (belum ada media diunggah), tampilkan placeholder jelas —
+  // bukan kotak kosong yang membingungkan — agar mudah dibedakan dari bug tampilan.
+  wrap.innerHTML = data.map((g,i) => {
+    const kosong = !g.tautan;
+    const gayaLatar = kosong ? 'background:var(--surface-container);' : (g.jenis === 'video' ? 'background:var(--primary-dark);' : `background-image:url('${g.tautan}')`);
+    return `
+    <div class="gal-item" style="${gayaLatar}" data-i="${i}">
+      ${kosong ? `<div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--text-muted);font-size:11px;gap:4px;">🖼<span>Belum ada media</span></div>` : ''}
+      ${(!kosong && g.jenis === 'video') ? '<span class="play">▶ Video</span>' : ''}
       <div class="overlay"><span>${g.judul||''}</span></div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
   document.querySelectorAll('.gal-item').forEach(el => el.addEventListener('click', () => {
     const item = data[Number(el.getAttribute('data-i'))];
     openLightbox(item);
@@ -126,14 +136,12 @@ function render() {
 function openLightbox(item) {
   const content = document.getElementById('lightbox-content');
   if (item.jenis === 'video') {
-    // Jika tautan berupa YouTube, tetap pakai iframe (tidak dapat diputar via <video> HTML5);
-    // selain itu (mis. file mp4 dari Drive) pakai player HTML5 asli sesuai Modul 02.
-    if (/youtube|youtu\.be/.test(item.tautan)) {
-      const embedUrl = item.tautan.replace('watch?v=', 'embed/');
-      content.innerHTML = `<iframe src="${embedUrl}" style="width:80vw;max-width:900px;aspect-ratio:16/9;border:0;border-radius:10px;" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
-    } else {
-      content.innerHTML = `<video controls autoplay playsinline style="max-width:92vw;max-height:88vh;"><source src="${item.tautan}">Browser Anda tidak mendukung pemutaran video ini.</video>`;
-    }
+    // [ADDITIVE v2 — koreksi audit] video Drive HANYA andal via iframe /preview resmi
+    // (lihat backend/Media.gs); YouTube tetap iframe embed biasa. <video src> dilepas
+    // karena sering gagal untuk berkas Drive (halaman konfirmasi/virus-scan, no range-request).
+    const isYoutube = /youtube\.com|youtu\.be/.test(item.tautan);
+    const src = isYoutube ? item.tautan.replace('watch?v=', 'embed/') : item.tautan;
+    content.innerHTML = `<iframe src="${src}" style="width:80vw;max-width:900px;aspect-ratio:16/9;border:0;border-radius:10px;" allow="autoplay; fullscreen" allowfullscreen></iframe>`;
   } else {
     content.innerHTML = `<img src="${item.tautan}" alt="${item.judul||''}">`;
   }

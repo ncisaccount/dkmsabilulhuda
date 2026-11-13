@@ -49,12 +49,12 @@
   <div class="container grid grid-2">
     <div>
       <h2>📖 Sejarah Singkat Pembangunan</h2>
-      <p>Masjid Sabilul Huda didirikan atas prakarsa para tokoh agama, sesepuh, dan warga Muslim Sukamaju, berawal dari gotong royong untuk membangun ruang ibadah sederhana. Kini, Masjid Sabilul Huda berdiri megah di atas lahan ±1.200 m², melayani ribuan jamaah setiap pekan lewat ibadah ritual, infaq terkelola secara akuntabel, kajian keilmuan, serta pemberdayaan ekonomi umat.</p>
+      <p id="teks-sejarah">Masjid Sabilul Huda didirikan atas prakarsa para tokoh agama, sesepuh, dan warga Muslim Sukamaju, berawal dari gotong royong untuk membangun ruang ibadah sederhana. Kini, Masjid Sabilul Huda berdiri megah di atas lahan ±3.200 m², melayani ribuan jamaah setiap pekan lewat ibadah ritual, infaq terkelola secara akuntabel, kajian keilmuan, serta pemberdayaan ekonomi umat.</p>
       <div class="stat-row">
-        <div><strong>500+</strong>Daya Tampung Jamaah</div>
-        <div><strong>1.200 m²</strong>Luas Tanah &amp; Bangunan</div>
-        <div><strong>18 Program</strong>Layanan Aktif ZISWAF</div>
-        <div><strong>1986 M</strong>Tahun Pendirian</div>
+        <div><strong id="stat-jamaah">2.500+</strong>Daya Tampung Jamaah</div>
+        <div><strong id="stat-luas">3.200 m²</strong>Luas Tanah &amp; Bangunan</div>
+        <div><strong id="stat-program">18 Program</strong>Layanan Aktif ZISWAF</div>
+        <div><strong id="stat-tahun">1998 M</strong>Tahun Pendirian</div>
       </div>
     </div>
     <div class="card"><div class="card-img" style="background:linear-gradient(135deg,var(--primary),var(--primary-dark));display:flex;align-items:center;justify-content:center;color:#cde3da;font-family:var(--font-heading);">Interior Masjid</div></div>
@@ -65,16 +65,15 @@
   <div class="container grid grid-2">
     <div class="card" style="padding:1.5rem;">
       <h3>🕊 Visi Utama</h3>
-      <p style="font-family:var(--font-heading);font-style:italic;color:var(--primary);font-size:18px;">"Menjadi pusat peradaban Islam yang mandiri, makmur, dan melayani umat dengan rahmatan lil 'alamin."</p>
-      <p>Terwujudnya masjid yang tidak hanya hidup dalam ibadah mahdhah, melainkan juga menaungi pilar keilmuan, ekonomi, dan harmoni sosial warga Sukamaju.</p>
+      <p id="teks-visi" style="font-family:var(--font-heading);font-style:italic;color:var(--primary);font-size:18px;">"Menjadi pusat peradaban Islam yang mandiri, makmur, dan melayani umat dengan rahmatan lil 'alamin."</p>
     </div>
     <div>
       <h3>🎯 4 Pilar Misi DKM</h3>
-      <div class="pilar-grid">
-        <div class="card" style="padding:1rem;"><strong style="color:var(--primary);">Syiar Ibadah</strong><p style="font-size:13px;margin:.3rem 0 0;">Ketertiban salat &amp; keterampilan beribadah jamaah.</p></div>
-        <div class="card" style="padding:1rem;"><strong style="color:var(--primary);">Pendidikan</strong><p style="font-size:13px;margin:.3rem 0 0;">Kajian Qur'an, majelis ilmu, ruang kreatif remaja (RISMA).</p></div>
-        <div class="card" style="padding:1rem;"><strong style="color:var(--primary);">Ekonomi Umat</strong><p style="font-size:13px;margin:.3rem 0 0;">Zakat, Infaq, Sedekah, dan Wakaf (ZISWAF) bagi mustahik.</p></div>
-        <div class="card" style="padding:1rem;"><strong style="color:var(--primary);">Tata Kelola Digital</strong><p style="font-size:13px;margin:.3rem 0 0;">Transparansi keuangan &amp; informasi dakwah berbasis digital.</p></div>
+      <div class="pilar-grid" id="pilar-misi-grid">
+        <div class="card" style="padding:1rem;"><strong style="color:var(--primary);" class="misi-judul">Syiar Ibadah</strong><p style="font-size:13px;margin:.3rem 0 0;" class="misi-isi">Ketertiban salat &amp; keterampilan beribadah jamaah.</p></div>
+        <div class="card" style="padding:1rem;"><strong style="color:var(--primary);" class="misi-judul">Pendidikan</strong><p style="font-size:13px;margin:.3rem 0 0;" class="misi-isi">Kajian Qur'an, majelis ilmu, ruang kreatif remaja (RISMA).</p></div>
+        <div class="card" style="padding:1rem;"><strong style="color:var(--primary);" class="misi-judul">Ekonomi Umat</strong><p style="font-size:13px;margin:.3rem 0 0;" class="misi-isi">Zakat, Infaq, Sedekah, dan Wakaf (ZISWAF) bagi mustahik.</p></div>
+        <div class="card" style="padding:1rem;"><strong style="color:var(--primary);" class="misi-judul">Tata Kelola Digital</strong><p style="font-size:13px;margin:.3rem 0 0;" class="misi-isi">Transparansi keuangan &amp; informasi dakwah berbasis digital.</p></div>
       </div>
     </div>
   </div>
@@ -96,21 +95,47 @@
 <script src="js/config.js"></script>
 <script src="js/api.js"></script>
 <script>
+// [ADDITIVE v2 — Modul 05] Isi narasi Profil Website dari Pengaturan (hasil
+// edit Admin di admin/profil-website.html). Jika admin belum pernah mengisi
+// (key kosong/tidak ada), teks default yang sudah ada di HTML TETAP tampil
+// — tidak pernah menampilkan halaman kosong hanya karena belum dikonfigurasi.
+async function muatProfilWebsiteDinamis_() {
+  const res = await Api.get('pengaturan');
+  if (!res.success) return;
+  const map = {}; res.data.forEach(r => map[r.key] = r.value);
+
+  const isi = (id, key) => { const el = document.getElementById(id); if (el && map[key]) el.textContent = map[key]; };
+  isi('teks-sejarah', 'profil_sejarah');
+  isi('stat-jamaah', 'profil_stat_jamaah');
+  isi('stat-luas', 'profil_stat_luas');
+  isi('stat-program', 'profil_stat_program');
+  isi('stat-tahun', 'profil_stat_tahun');
+  if (map.profil_visi) document.getElementById('teks-visi').textContent = '"' + map.profil_visi + '"';
+
+  const kartuMisi = document.querySelectorAll('#pilar-misi-grid .card');
+  kartuMisi.forEach((kartu, i) => {
+    const judul = map['profil_misi' + (i + 1) + '_judul'];
+    const isiMisi = map['profil_misi' + (i + 1) + '_isi'];
+    if (judul) kartu.querySelector('.misi-judul').textContent = judul;
+    if (isiMisi) kartu.querySelector('.misi-isi').textContent = isiMisi;
+  });
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
-  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_(); catatKunjunganHalaman('profil');
+  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_(); muatProfilWebsiteDinamis_(); catatKunjunganHalaman('profil');
   const res = await Api.get('pengurus');
   if (!res.success || !res.data.length) { document.getElementById('pengurus-grid').innerHTML = '<div class="empty-state">Data pengurus belum tersedia.</div>'; return; }
   const list = res.data.slice().sort((a,b) => Number(a.urutan||99) - Number(b.urutan||99));
   const utama = list[0], lainnya = list.slice(1);
   document.getElementById('pengurus-utama').innerHTML = `
     <div class="pengurus-utama">
-      ${utama.foto ? `<img src="${utama.foto}">` : `<div class="ph"></div>`}
+      ${utama.foto ? `<img src="${utama.foto}">` : `<div class="ph" style="display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-muted);">👤</div>`}
       <h3 style="margin:.2rem 0;">${utama.nama}</h3>
       <p style="color:var(--gold-hover);font-weight:600;">${utama.jabatan}</p>
     </div>`;
   document.getElementById('pengurus-grid').innerHTML = lainnya.map(p => `
     <div class="card pengurus-card" style="padding:1.2rem;">
-      ${p.foto ? `<img src="${p.foto}">` : `<div class="ph"></div>`}
+      ${p.foto ? `<img src="${p.foto}">` : `<div class="ph" style="display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-muted);">👤</div>`}
       <strong>${p.nama}</strong>
       <p style="font-size:13px;color:var(--gold-hover);margin:.2rem 0 0;">${p.jabatan}</p>
     </div>`).join('');

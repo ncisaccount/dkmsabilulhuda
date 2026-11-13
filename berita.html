@@ -98,7 +98,7 @@ async function muatBerita() {
   if (!items.length) { wrap.innerHTML = '<div class="empty-state">Tidak ada berita ditemukan.</div>'; document.getElementById('pagination').innerHTML=''; return; }
   wrap.innerHTML = items.map(b => `
     <a class="card" href="berita-detail.html?slug=${encodeURIComponent(b.slug||'')}">
-      <div class="media-frame media-frame--16x9 media-frame--crop">${b.gambar ? `<img src="${b.gambar}" alt="${b.judul}" loading="lazy">` : ''}</div>
+      <div class="media-frame media-frame--16x9 media-frame--crop">${renderMediaFrame_(b.gambar)}</div>
       <div class="card-body">
         <span class="tag">${b.kategori || 'Berita'}</span>
         <h3>${b.judul}</h3>

@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const utama = SEMUA_IMAM.find(i => /ketua|besar|syariah/i.test(i.peran || '')) || SEMUA_IMAM[0];
   document.getElementById('imam-utama').innerHTML = `
     <div class="card director-card">
-      ${utama.foto ? `<img src="${utama.foto}">` : `<div class="ph"></div>`}
+      ${utama.foto ? `<img src="${utama.foto}">` : `<div class="ph" style="display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-muted);">👤</div>`}
       <div>
         <span class="tag">${utama.peran || 'Dewan Syariah'}</span>
         <h3 style="margin:.2rem 0;">${utama.nama}</h3>
@@ -105,7 +105,7 @@ function renderAsatidz(filter) {
   if (!data.length) { wrap.innerHTML = '<div class="empty-state">Belum ada data untuk kategori ini.</div>'; return; }
   wrap.innerHTML = data.map(i => `
     <div class="card asatidz-card">
-      ${i.foto ? `<img src="${i.foto}">` : `<div class="ph"></div>`}
+      ${i.foto ? `<img src="${i.foto}">` : `<div class="ph" style="display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-muted);">👤</div>`}
       <strong>${i.nama}</strong>
       <p style="font-size:12px;color:var(--gold-hover);font-weight:600;margin:.2rem 0;">${i.peran || ''}</p>
       <p style="font-size:12px;">${(i.bio||'').slice(0,60)}${(i.bio||'').length>60?'…':''}</p>

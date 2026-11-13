@@ -104,7 +104,7 @@ function renderBerita(list) {
   if (!list.length) { wrap.innerHTML = '<div class="empty-state">Belum ada berita.</div>'; return; }
   wrap.innerHTML = list.map(b => `
     <a class="card" href="berita-detail.html?slug=${encodeURIComponent(b.slug || '')}">
-      <div class="media-frame media-frame--16x9 media-frame--crop">${b.gambar ? `<img src="${b.gambar}" alt="${b.judul}" loading="lazy">` : ''}</div>
+      <div class="media-frame media-frame--16x9 media-frame--crop">${renderMediaFrame_(b.gambar)}</div>
       <div class="card-body">
         <span class="tag">${b.kategori || 'Berita'}</span>
         <h3>${b.judul}</h3>
@@ -145,11 +145,12 @@ function renderProgram(list) {
 function renderGaleri(list) {
   const wrap = document.getElementById('galeri-grid');
   if (!wrap) return;
-  // [ADDITIVE v2 — Modul 02] thumbnail tetap pakai mode crop (sesuai untuk grid galeri),
-  // tautan ke halaman Galeri lengkap untuk pemutaran video penuh di dalam frame.
+  // [ADDITIVE v2 — koreksi audit] thumbnail video Drive TIDAK bisa dipakai sebagai <video src>
+  // (lihat catatan Media.gs) — thumbnail mini di Beranda untuk video cukup kotak gelap + ikon
+  // putar yang mengarah ke halaman Galeri lengkap (di sana videonya diputar lewat iframe resmi).
   wrap.innerHTML = list.map(g => `
-    <a class="g-item media-frame media-frame--1x1 media-frame--crop" href="galeri.html" style="position:relative;">
-      ${g.jenis === 'video' ? `<video src="${g.tautan||''}" muted></video><span class="media-play-badge">▶</span>` : `<img src="${g.tautan||''}" alt="${g.judul||''}" loading="lazy">`}
+    <a class="g-item media-frame media-frame--1x1 media-frame--crop" href="galeri.html" style="position:relative;${g.jenis==='video' ? 'background:var(--primary-dark);' : ''}">
+      ${g.jenis === 'video' ? `<span class="media-play-badge" style="position:static;background:none;font-size:22px;">▶</span>` : `<img src="${g.tautan||''}" alt="${g.judul||''}" loading="lazy">`}
       <span style="position:absolute;bottom:6px;left:8px;color:#fff;font-size:11px;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.6);">${g.judul||''}</span>
     </a>`).join('');
 }

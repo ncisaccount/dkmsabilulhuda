@@ -6,7 +6,32 @@
 // Proteksi halaman: redirect ke login jika belum ada sesi (R12 gas-rahasia: batasi akses).
 function guardAdmin_() {
   if (!Auth.isLoggedIn()) { window.location.href = 'login.html'; return null; }
+  cekKoneksiBackendDanPeringatkan_(); // [ADDITIVE — audit lapangan] deteksi backend tidak terhubung sedini mungkin
   return Auth.getUser();
+}
+
+/**
+ * [ADDITIVE — audit lapangan] Banner peringatan yang JELAS dan TERLIHAT (bukan
+ * cuma di console) kapan pun backend tidak terhubung — baik karena GAS_URL
+ * masih placeholder, atau Web App belum di-deploy ulang dengan versi terbaru,
+ * atau sesi kedaluwarsa. Ini sering jadi akar "fitur tidak berfungsi" yang
+ * sebenarnya adalah masalah konfigurasi/deployment, bukan bug kode.
+ */
+async function cekKoneksiBackendDanPeringatkan_() {
+  const errKonfig = cekKonfigurasiGasUrl_();
+  if (errKonfig) { tampilkanBannerKoneksi_(errKonfig); return; }
+  const res = await Api.get('pengaturan'); // action publik ringan, cukup untuk tes konektivitas
+  if (!res.success && !res.stale) {
+    tampilkanBannerKoneksi_('Tidak dapat terhubung ke backend Apps Script. Pastikan: (1) URL di js/config.js benar, (2) Web App sudah di-"Deploy" ulang (Manage deployments → Edit → New version) setelah perubahan kode terbaru, (3) akses "Anyone" masih aktif. Detail teknis ada di konsol browser (tekan F12).');
+  }
+}
+function tampilkanBannerKoneksi_(pesan) {
+  if (document.getElementById('banner-koneksi')) return;
+  const el = document.createElement('div');
+  el.id = 'banner-koneksi';
+  el.style.cssText = 'background:#BA1A1A;color:#fff;padding:10px 20px;font-size:13px;position:sticky;top:0;z-index:999;';
+  el.innerHTML = '⚠️ <strong>Backend tidak terhubung:</strong> ' + pesan;
+  document.body.prepend(el);
 }
 
 const MENU_ADMIN = [
@@ -22,6 +47,7 @@ const MENU_ADMIN = [
 ];
 const MENU_ADMIN_ONLY = [
   { href: 'pengguna.html', label: 'Pengguna & Hak Akses', icon: '🔐' },
+  { href: 'profil-website.html', label: 'Edit Profil Website', icon: '📝' },
   { href: 'pengaturan.html', label: 'Pengaturan Situs', icon: '⚙️' },
 ];
 // [ADDITIVE v2 — Modul 06] tersedia untuk Admin maupun Operator (profil milik sendiri).
