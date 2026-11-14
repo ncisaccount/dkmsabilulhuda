@@ -58,7 +58,7 @@
 <script src="js/shared.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', async () => {
-  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_();
+  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_(); muatMenuHeaderTambahan_();
   const slug = new URLSearchParams(location.search).get('slug');
   const wrap = document.getElementById('artikel-wrap');
   if (!slug) { wrap.innerHTML = '<div class="empty-state">Artikel tidak ditemukan.</div>'; return; }

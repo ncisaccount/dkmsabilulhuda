@@ -48,6 +48,44 @@ function terapkanPengaturanUmum_(list) {
   }
   const favicon = document.querySelector('link[rel="icon"]');
   if (favicon && map.favicon) favicon.href = map.favicon;
+
+  // [ADDITIVE v7] Foto Hero Section — hanya berlaku di Beranda (elemen #beranda-hero).
+  // Kalau admin belum pernah unggah, variabel CSS tidak di-set -> fallback gradasi
+  // default (lihat css/style.css) tetap tampil seperti semula, tidak pernah rusak.
+  const hero = document.getElementById('beranda-hero');
+  if (hero && map.hero_background) {
+    hero.style.setProperty('--hero-photo-url', `url('${map.hero_background}')`);
+  }
+}
+
+/**
+ * [ADDITIVE v7] Menu Header tambahan — disisipkan SEBELUM tombol tema/donasi,
+ * SESUDAH 7 menu default yang tetap hardcode di tiap halaman (tidak disentuh).
+ * Dipanggil dari semua halaman publik lewat muatMenuHeaderTambahan_().
+ */
+async function muatMenuHeaderTambahan_() {
+  const nav = document.getElementById('nav-links');
+  if (!nav) return;
+  try {
+    const res = await Api.get('menuHeaderPublik');
+    if (!res.success || !res.data.length) return;
+    const html = res.data.map(m => `<a href="${m.url}" target="${m.target || '_self'}">${m.label}</a>`).join('');
+    nav.insertAdjacentHTML('beforeend', html);
+  } catch (e) { /* menu tambahan opsional — kegagalan diam-diam saja, menu default tetap jalan */ }
+}
+
+/**
+ * [ADDITIVE v7] Inisialisasi carousel horizontal sederhana (Galeri "berjalan
+ * kiri ke kanan") — tombol panah menggeser 1 "halaman" (lebar container).
+ */
+function initHCarousel_(trackId, btnPrevId, btnNextId) {
+  const track = document.getElementById(trackId);
+  const prev = document.getElementById(btnPrevId);
+  const next = document.getElementById(btnNextId);
+  if (!track) return;
+  const geser = (arah) => track.scrollBy({ left: arah * track.clientWidth * 0.85, behavior: 'smooth' });
+  if (prev) prev.addEventListener('click', () => geser(-1));
+  if (next) next.addEventListener('click', () => geser(1));
 }
 
 /**

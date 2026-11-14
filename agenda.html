@@ -88,7 +88,7 @@ let cur = new Date();
 let kategoriAktif = '';
 
 document.addEventListener('DOMContentLoaded', async () => {
-  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_(); catatKunjunganHalaman('agenda');
+  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_(); muatMenuHeaderTambahan_(); catatKunjunganHalaman('agenda');
   document.getElementById('cal-dow').innerHTML = NAMA_HARI.map(h => `<div class="cal-dow">${h}</div>`).join('');
 
   const res = await Api.get('agenda', { perHalaman: 500 });

@@ -45,11 +45,39 @@
 
       <h3>🕊 Visi Utama</h3>
       <div class="pw-field"><label>Kalimat Visi</label><textarea name="profil_visi" rows="2"></textarea></div>
+      <h3>🤝 Falsafah Kerja</h3>
+      <div class="pw-field"><label>Pisahkan dengan koma</label><input type="text" name="profil_falsafah" placeholder="Keikhlasan, Amanah, Ukhuwah, Profesionalitas"></div>
     </div>
 
     <div class="admin-card" style="max-width:720px;">
       <h3 style="margin-top:0;">🎯 4 Pilar Misi DKM</h3>
       <div id="misi-wrap"></div>
+    </div>
+
+    <!-- [ADDITIVE v7] Akuntabilitas & Legalitas -->
+    <div class="admin-card" style="max-width:720px;">
+      <h3 style="margin-top:0;">🛡 Akuntabilitas &amp; Legalitas Resmi</h3>
+      <div class="pw-field"><label>Nomor ID Masjid (Kemenag)</label><input type="text" name="profil_nomor_id_masjid" placeholder="01.4.12.08.02.00041"></div>
+      <div class="pw-field"><label>Nomor Surat Keputusan (SK) DKM</label><input type="text" name="profil_sk_dkm_nomor" placeholder="SK/014/DKM-SKM/2024"></div>
+      <div class="pw-field" style="margin-bottom:0;"><label>Rekening Infaq Bank Syariah</label><input type="text" name="profil_rekening_infaq" placeholder="771-2345-890 BSI a.n Masjid Sabilul Huda"></div>
+    </div>
+
+    <!-- [ADDITIVE v7] Unduh Dokumen & Arsip Organisasi -->
+    <div class="admin-card" style="max-width:720px;">
+      <h3 style="margin-top:0;">📄 Unduh Dokumen &amp; Arsip Organisasi</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin-top:-.5rem;">Unggah maks. 2 dokumen resmi (PDF) yang akan tampil sebagai kartu unduhan di halaman Profil publik.</p>
+      <div class="pw-misi-card">
+        <strong>Dokumen 1</strong>
+        <div class="pw-field" style="margin-top:.5rem;"><label>Label</label><input type="text" name="profil_dokumen1_label" placeholder="AD/ART & Tata Tertib DKM"></div>
+        <div class="pw-field"><label>Info Singkat</label><input type="text" name="profil_dokumen1_info" placeholder="PDF Dokumen • 2.4 MB • Diperbarui Jan 2024"></div>
+        <div class="pw-field" style="margin-bottom:0;"><label>Berkas PDF</label><div id="upload-dok1"></div></div>
+      </div>
+      <div class="pw-misi-card" style="margin-bottom:0;">
+        <strong>Dokumen 2</strong>
+        <div class="pw-field" style="margin-top:.5rem;"><label>Label</label><input type="text" name="profil_dokumen2_label" placeholder="Salinan SK Pengurus DKM"></div>
+        <div class="pw-field"><label>Info Singkat</label><input type="text" name="profil_dokumen2_info" placeholder="PDF Dokumen • 1.8 MB • Pengesahan BKM Sukamaju"></div>
+        <div class="pw-field" style="margin-bottom:0;"><label>Berkas PDF</label><div id="upload-dok2"></div></div>
+      </div>
     </div>
 
     <button class="btn btn-primary" id="btn-simpan" style="margin-bottom:2rem;">💾 Simpan Profil Website</button>
@@ -60,6 +88,7 @@
 <script src="../js/config.js"></script>
 <script src="../js/api.js"></script>
 <script src="js/admin.js"></script>
+<script src="js/media-upload.js"></script>
 <script>
 const JUDUL_MISI_DEFAULT = ['Syiar Ibadah', 'Pendidikan', 'Ekonomi Umat', 'Tata Kelola Digital'];
 const ISI_MISI_DEFAULT = [
@@ -84,16 +113,25 @@ document.addEventListener('DOMContentLoaded', async () => {
       <div class="pw-field" style="margin-bottom:0;"><label>Deskripsi</label><textarea name="profil_misi${i+1}_isi" rows="2" placeholder="${ISI_MISI_DEFAULT[i]}"></textarea></div>
     </div>`).join('');
 
+  // [ADDITIVE v7] Widget upload untuk 2 dokumen PDF resmi.
+  const widgetDok1 = initMediaUpload('upload-dok1', { kategori: 'dokumen', multiple: false, accept: 'application/pdf' });
+  const widgetDok2 = initMediaUpload('upload-dok2', { kategori: 'dokumen', multiple: false, accept: 'application/pdf' });
+
   const res = await Api.get('adminPengaturan', { token: Auth.getToken() });
   const form = document.querySelector('main');
+  let petaPengaturan = {};
   if (res.success) {
-    res.data.forEach(r => { const el = form.querySelector(`[name="${r.key}"]`); if (el) el.value = r.value; });
+    res.data.forEach(r => { petaPengaturan[r.key] = r.value; const el = form.querySelector(`[name="${r.key}"]`); if (el) el.value = r.value; });
+    if (petaPengaturan.profil_dokumen1_url) widgetDok1.setValue(petaPengaturan.profil_dokumen1_url);
+    if (petaPengaturan.profil_dokumen2_url) widgetDok2.setValue(petaPengaturan.profil_dokumen2_url);
   }
 
   document.getElementById('btn-simpan').addEventListener('click', async () => {
     const status = document.getElementById('status-msg');
     const data = {};
     form.querySelectorAll('input[name], textarea[name]').forEach(el => { data[el.name] = el.value; });
+    data.profil_dokumen1_url = widgetDok1.getValue() || petaPengaturan.profil_dokumen1_url || '';
+    data.profil_dokumen2_url = widgetDok2.getValue() || petaPengaturan.profil_dokumen2_url || '';
     status.textContent = 'Menyimpan…'; status.style.color = 'var(--text-muted)';
     const r = await Api.post('simpanPengaturan', { data });
     status.textContent = r.success ? '✅ Profil Website berhasil disimpan & langsung tampil di halaman Profil publik.' : '⚠️ ' + r.message;

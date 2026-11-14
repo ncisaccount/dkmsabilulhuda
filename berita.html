@@ -74,7 +74,7 @@
 <script>
 let state = { kategori: '', q: '', halaman: 1 };
 document.addEventListener('DOMContentLoaded', () => {
-  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_(); catatKunjunganHalaman('berita');
+  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_(); muatMenuHeaderTambahan_(); catatKunjunganHalaman('berita');
   muatBerita();
   document.getElementById('filter-bar').addEventListener('click', (e) => {
     if (!e.target.matches('.filter-chip')) return;

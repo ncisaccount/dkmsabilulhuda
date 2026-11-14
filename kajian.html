@@ -74,7 +74,7 @@
 const URUTAN_HARI = ['senin','selasa','rabu','kamis','jumat','sabtu','ahad'];
 let SEMUA_KAJIAN = [];
 document.addEventListener('DOMContentLoaded', async () => {
-  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_(); catatKunjunganHalaman('kajian');
+  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_(); muatMenuHeaderTambahan_(); catatKunjunganHalaman('kajian');
   const res = await Api.get('kajian');
   if (!res.success || !res.data.length) { document.getElementById('kajian-wrap').innerHTML = '<div class="empty-state">Jadwal kajian belum tersedia.</div>'; return; }
   SEMUA_KAJIAN = res.data;

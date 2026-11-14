@@ -48,6 +48,7 @@ const MENU_ADMIN = [
 const MENU_ADMIN_ONLY = [
   { href: 'pengguna.html', label: 'Pengguna & Hak Akses', icon: '🔐' },
   { href: 'profil-website.html', label: 'Edit Profil Website', icon: '📝' },
+  { href: 'menu-header.html', label: 'Menu Header', icon: '📋' },
   { href: 'pengaturan.html', label: 'Pengaturan Situs', icon: '⚙️' },
 ];
 // [ADDITIVE v2 — Modul 06] tersedia untuk Admin maupun Operator (profil milik sendiri).

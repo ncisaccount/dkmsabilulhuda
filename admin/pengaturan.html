@@ -39,6 +39,17 @@
       <p id="status-msg" style="font-size:13px;margin-top:.6rem;"></p>
     </div>
 
+    <!-- [ADDITIVE v7] Foto Hero Section Beranda -->
+    <div class="admin-card">
+      <h3 style="margin-top:0;">🖼 Foto Hero Section (Beranda)</h3>
+      <p style="font-size:13px;color:var(--text-muted);margin-top:-.5rem;">Unggah foto asli Masjid Sabilul Huda (bukan foto generik) untuk ditampilkan sebagai latar Hero Section di Beranda. Gambar otomatis tersimpan ke Google Drive dan URL-nya terisi sendiri — Anda tidak perlu menyalin link secara manual.</p>
+      <img id="preview-hero_background" style="max-height:180px;max-width:100%;object-fit:contain;display:block;margin:.6rem 0;background:var(--surface-container);border-radius:10px;padding:4px;">
+      <div id="upload-hero_background"></div>
+      <button class="btn btn-primary" id="btn-simpan-hero" style="margin-top:1rem;">💾 Simpan Foto Hero</button>
+      <button class="btn btn-ghost" id="btn-reset-hero" type="button">↺ Kembalikan ke Gradasi Default</button>
+      <p id="status-hero" style="font-size:13px;margin-top:.6rem;"></p>
+    </div>
+
     <!-- [ADDITIVE v2 — Modul 05] Edit Logo Aplikasi -->
     <div class="admin-card">
       <h3 style="margin-top:0;">🖼 Logo Aplikasi</h3>
@@ -116,6 +127,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     const r = await Api.post('simpanPengaturan', { data });
     status.textContent = r.success ? '✅ ' + r.message : '⚠️ ' + r.message;
     status.style.color = r.success ? 'green' : 'var(--error)';
+  });
+
+  // ===== [ADDITIVE v7] Foto Hero Section =====
+  const widgetHero = initMediaUpload('upload-hero_background', { kategori: 'banner', multiple: false, accept: 'image/*' });
+  if (pengaturanMap.hero_background) {
+    widgetHero.setValue(pengaturanMap.hero_background);
+    document.getElementById('preview-hero_background').src = pengaturanMap.hero_background;
+  }
+  document.getElementById('btn-simpan-hero').addEventListener('click', async () => {
+    const status = document.getElementById('status-hero');
+    const url = widgetHero.getValue();
+    if (!url) { status.textContent = '⚠️ Pilih/unggah foto terlebih dahulu.'; status.style.color = 'var(--error)'; return; }
+    status.textContent = 'Menyimpan…'; status.style.color = 'var(--text-muted)';
+    const r = await Api.post('simpanPengaturan', { data: { hero_background: url } });
+    status.textContent = r.success ? '✅ Foto Hero tersimpan & langsung tampil di Beranda.' : '⚠️ ' + r.message;
+    status.style.color = r.success ? 'green' : 'var(--error)';
+    if (r.success) document.getElementById('preview-hero_background').src = url;
+  });
+  document.getElementById('btn-reset-hero').addEventListener('click', async () => {
+    if (!confirm('Kembalikan Hero Section ke gradasi default (tanpa foto)?')) return;
+    await Api.post('simpanPengaturan', { data: { hero_background: '' } });
+    document.getElementById('preview-hero_background').src = '';
+    tampilkanToast('Hero Section dikembalikan ke gradasi default.', true);
   });
 
   // ===== [ADDITIVE v2] Modul 05 — Logo Aplikasi =====

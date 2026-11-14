@@ -123,9 +123,12 @@ const SKEMA = {
     fields: [
       {key:'nama', label:'Nama Lengkap', type:'text', required:true},
       {key:'jabatan', label:'Jabatan', type:'text', required:true},
-      {key:'periode', label:'Periode', type:'text'},
+      {key:'kategori_jabatan', label:'Kategori (untuk filter tab di halaman Profil)', type:'select', options:['inti','bidang']},
+      {key:'deskripsi', label:'Deskripsi Singkat / Kutipan Amanah', type:'textarea'},
+      {key:'email', label:'Email', type:'email'},
+      {key:'periode', label:'Periode / Amanah Sejak', type:'text'},
       {key:'foto', label:'Foto Profil', type:'media', kategoriMedia:'profil', acceptMedia:'image/*'},
-      {key:'urutan', label:'Urutan Tampil (angka)', type:'number'},
+      {key:'urutan', label:'Urutan Tampil (1 = Ketua Umum, angka terkecil tampil pertama)', type:'number'},
     ]},
   imam: { title: 'Imam & Penceramah', judulKey: 'nama', kolom: ['nama','peran','kontak'], statusOptions: ['aktif','nonaktif'],
     fields: [

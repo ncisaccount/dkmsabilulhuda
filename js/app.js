@@ -16,6 +16,8 @@ let TIMER_COUNTDOWN_SALAT = null;
 document.addEventListener('DOMContentLoaded', async () => {
   initThemeToggle();
   initMobileNav();
+  muatMenuHeaderTambahan_(); // [ADDITIVE v7]
+  initHCarousel_('galeri-grid', 'mini-gal-prev', 'mini-gal-next'); // [ADDITIVE v7]
   catatKunjunganHalaman('beranda');
 
   // Tampilkan cache dulu (instan), lalu render ulang setelah data segar datang (SWR).
@@ -179,13 +181,14 @@ function renderProgram(list) {
 function renderGaleri(list) {
   const wrap = document.getElementById('galeri-grid');
   if (!wrap) return;
-  // [ADDITIVE v2 — koreksi audit] thumbnail video Drive TIDAK bisa dipakai sebagai <video src>
-  // (lihat catatan Media.gs) — thumbnail mini di Beranda untuk video cukup kotak gelap + ikon
-  // putar yang mengarah ke halaman Galeri lengkap (di sana videonya diputar lewat iframe resmi).
+  // [ADDITIVE v7] Carousel horizontal — thumbnail video Drive TIDAK bisa dipakai sebagai
+  // background-image (hasil /preview adalah halaman, bukan file gambar), jadi thumbnail
+  // mini di Beranda untuk video cukup kotak gelap + ikon putar, mengarah ke halaman Galeri
+  // lengkap (di sana videonya diputar lewat iframe resmi).
   wrap.innerHTML = list.map(g => `
-    <a class="g-item media-frame media-frame--1x1 media-frame--crop" href="galeri.html" style="position:relative;${g.jenis==='video' ? 'background:var(--primary-dark);' : ''}">
-      ${g.jenis === 'video' ? `<span class="media-play-badge" style="position:static;background:none;font-size:22px;">▶</span>` : `<img src="${g.tautan||''}" alt="${g.judul||''}" loading="lazy">`}
-      <span style="position:absolute;bottom:6px;left:8px;color:#fff;font-size:11px;font-weight:600;text-shadow:0 1px 3px rgba(0,0,0,.6);">${g.judul||''}</span>
+    <a class="g-item" href="galeri.html" style="${g.jenis==='video' ? 'background:var(--primary-dark);display:flex;align-items:center;justify-content:center;' : `background-image:url('${g.tautan||''}')`}">
+      ${g.jenis === 'video' ? `<span style="font-size:22px;color:#fff;">▶</span>` : ''}
+      <span>${g.judul||''}</span>
     </a>`).join('');
 }
 

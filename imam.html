@@ -75,7 +75,7 @@
 <script>
 let SEMUA_IMAM = [];
 document.addEventListener('DOMContentLoaded', async () => {
-  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_(); catatKunjunganHalaman('imam');
+  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_(); muatMenuHeaderTambahan_(); catatKunjunganHalaman('imam');
   const res = await Api.get('imam');
   if (!res.success || !res.data.length) { document.getElementById('asatidz-grid').innerHTML = '<div class="empty-state">Data asatidz belum tersedia.</div>'; return; }
   SEMUA_IMAM = res.data;

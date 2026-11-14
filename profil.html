@@ -8,20 +8,27 @@
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 <style>
-  .hero-sm { background: linear-gradient(135deg,var(--primary-dark),var(--primary)); color:#fff; padding:2.5rem 0; }
-  .hero-sm .container p { color:#cde3da; margin:0; }
+  .hero-sm { position:relative; background: linear-gradient(135deg,var(--primary-dark),var(--primary)); color:#fff; padding:2.8rem 0; overflow:hidden; }
+  .hero-sm .container p { color:#cde3da; margin:0; max-width:620px; }
   .breadcrumb { font-size:13px; color:var(--text-muted); margin-bottom:1rem; }
   .stat-row { display:flex; gap:2rem; flex-wrap:wrap; margin:1.5rem 0; }
   .stat-row div { text-align:left; }
   .stat-row strong { display:block; font-size:24px; color:var(--primary); font-family:var(--font-heading); }
   .pilar-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
   @media (max-width:900px){ .pilar-grid{grid-template-columns:1fr 1fr;} .stat-row{gap:1rem;justify-content:space-between;} }
-  .pengurus-utama { max-width:420px; margin:0 auto 2rem; text-align:center; }
-  .pengurus-utama img, .pengurus-utama .ph { width:120px;height:120px;border-radius:50%;object-fit:cover;margin:0 auto 1rem;background:var(--surface-container); }
-  .pengurus-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1.2rem; }
-  @media (max-width:900px){ .pengurus-grid{grid-template-columns:1fr 1fr;} }
-  .pengurus-card { text-align:center; }
-  .pengurus-card img, .pengurus-card .ph { width:76px;height:76px;border-radius:50%;object-fit:cover;margin:0 auto .7rem;background:var(--surface-container); }
+  .pengurus-utama { max-width:460px; margin:0 auto 2rem; text-align:center; position:relative; padding:1.5rem; }
+  .pengurus-utama img, .pengurus-utama .ph { width:110px;height:110px;border-radius:50%;object-fit:cover;margin:0 auto 1rem;background:var(--surface-container); }
+  .pengurus-utama .quote { font-family:var(--font-heading); font-style:italic; color:var(--primary); font-size:15px; margin:.6rem 0; }
+  .pengurus-utama .kontak-row { display:flex; gap:1rem; justify-content:center; font-size:12px; color:var(--text-muted); flex-wrap:wrap; }
+  .inti-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem; }
+  @media (max-width:900px){ .inti-grid{grid-template-columns:1fr;} }
+  .inti-card { text-align:center; padding:1.3rem; }
+  .inti-card img, .inti-card .ph { width:80px;height:80px;border-radius:50%;object-fit:cover;margin:0 auto .7rem;background:var(--surface-container); }
+  .bidang-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
+  @media (max-width:900px){ .bidang-grid{grid-template-columns:1fr 1fr;} }
+  .bidang-card { text-align:center; padding:1.1rem; }
+  .bidang-card .ph { width:52px;height:52px;border-radius:50%;background:var(--prayer-active);color:var(--primary);display:flex;align-items:center;justify-content:center;margin:0 auto .6rem;font-size:20px; }
+  .bidang-card img { width:52px;height:52px;border-radius:50%;object-fit:cover;margin:0 auto .6rem; }
 </style>
 </head>
 <body>
@@ -39,11 +46,15 @@
   </div>
 </div></nav>
 
-<div class="hero-sm"><div class="container">
-  <div class="breadcrumb" style="color:#cde3da;">Beranda / Profil / Profil &amp; Struktur Pengurus</div>
-  <h1 style="color:#fff;">Profil &amp; Struktur Pengurus DKM</h1>
-  <p>Mengenal sejarah, visi misi keumatan, serta jajaran dewan pengurus Dewan Kemakmuran Masjid Sabilul Huda yang berkhidmat melayani jamaah.</p>
-</div></div>
+<div class="hero-sm">
+  <div class="bg-islamic-pattern" style="position:absolute;right:-40px;top:-60px;width:220px;height:220px;opacity:.08;" aria-hidden="true"></div>
+  <div class="container" style="position:relative;">
+    <div class="breadcrumb" style="color:#cde3da;">Beranda / Profil / Profil &amp; Struktur Pengurus</div>
+    <span class="amanah-badge" id="badge-amanah">Amanah Periode 2024–2029</span>
+    <h1 style="color:#fff;">Profil &amp; Struktur Pengurus DKM</h1>
+    <p>Mengenal sejarah panjang, visi misi keumatan, serta jajaran dewan pengurus Dewan Kemakmuran Masjid Sabilul Huda yang berkhidmat melayani jamaah.</p>
+  </div>
+</div>
 
 <section class="section">
   <div class="container grid grid-2">
@@ -61,29 +72,73 @@
   </div>
 </section>
 
-<section class="section" style="background:var(--surface-container);padding-top:3rem;padding-bottom:3rem;">
-  <div class="container grid grid-2">
-    <div class="card" style="padding:1.5rem;">
-      <h3>🕊 Visi Utama</h3>
-      <p id="teks-visi" style="font-family:var(--font-heading);font-style:italic;color:var(--primary);font-size:18px;">"Menjadi pusat peradaban Islam yang mandiri, makmur, dan melayani umat dengan rahmatan lil 'alamin."</p>
+<section class="section" style="background:var(--surface-container);padding-top:3rem;padding-bottom:3rem;position:relative;overflow:hidden;">
+  <div class="bg-islamic-pattern" style="position:absolute;left:-60px;bottom:-60px;width:220px;height:220px;opacity:.06;" aria-hidden="true"></div>
+  <div class="container" style="position:relative;">
+    <div class="section-head" style="display:block;text-align:center;margin-bottom:2rem;">
+      <span class="amanah-badge">Arah Perjuangan Organisasi</span>
+      <h2 style="margin:.3rem 0 0;">Visi &amp; Misi Kepengurusan DKM</h2>
+      <p style="max-width:560px;margin:.4rem auto 0;">Pedoman strategis bagi seluruh dewan pembina dan pengurus dalam memegang amanat memakmurkan rumah Allah SWT.</p>
     </div>
-    <div>
-      <h3>🎯 4 Pilar Misi DKM</h3>
-      <div class="pilar-grid" id="pilar-misi-grid">
-        <div class="card" style="padding:1rem;"><strong style="color:var(--primary);" class="misi-judul">Syiar Ibadah</strong><p style="font-size:13px;margin:.3rem 0 0;" class="misi-isi">Ketertiban salat &amp; keterampilan beribadah jamaah.</p></div>
-        <div class="card" style="padding:1rem;"><strong style="color:var(--primary);" class="misi-judul">Pendidikan</strong><p style="font-size:13px;margin:.3rem 0 0;" class="misi-isi">Kajian Qur'an, majelis ilmu, ruang kreatif remaja (RISMA).</p></div>
-        <div class="card" style="padding:1rem;"><strong style="color:var(--primary);" class="misi-judul">Ekonomi Umat</strong><p style="font-size:13px;margin:.3rem 0 0;" class="misi-isi">Zakat, Infaq, Sedekah, dan Wakaf (ZISWAF) bagi mustahik.</p></div>
-        <div class="card" style="padding:1rem;"><strong style="color:var(--primary);" class="misi-judul">Tata Kelola Digital</strong><p style="font-size:13px;margin:.3rem 0 0;" class="misi-isi">Transparansi keuangan &amp; informasi dakwah berbasis digital.</p></div>
+    <div class="grid grid-2">
+      <div class="card" style="padding:1.5rem;">
+        <h3>👁 Visi Utama</h3>
+        <p id="teks-visi" style="font-family:var(--font-heading);font-style:italic;color:var(--primary);font-size:18px;">"Menjadi pusat peradaban Islam yang mandiri, makmur, dan melayani umat dengan rahmatan lil 'alamin."</p>
       </div>
+      <div>
+        <h3>☰ Komitmen Pengabdian Nyata</h3>
+        <div class="pilar-grid" id="pilar-misi-grid">
+          <div class="card" style="padding:1rem;"><strong style="color:var(--primary);" class="misi-judul">Syiar Ibadah</strong><p style="font-size:13px;margin:.3rem 0 0;" class="misi-isi">Ketertiban salat &amp; keterampilan beribadah jamaah.</p></div>
+          <div class="card" style="padding:1rem;"><strong style="color:var(--primary);" class="misi-judul">Pendidikan</strong><p style="font-size:13px;margin:.3rem 0 0;" class="misi-isi">Kajian Qur'an, majelis ilmu, ruang kreatif remaja (RISMA).</p></div>
+          <div class="card" style="padding:1rem;"><strong style="color:var(--primary);" class="misi-judul">Ekonomi Umat</strong><p style="font-size:13px;margin:.3rem 0 0;" class="misi-isi">Zakat, Infaq, Sedekah, dan Wakaf (ZISWAF) bagi mustahik.</p></div>
+          <div class="card" style="padding:1rem;"><strong style="color:var(--primary);" class="misi-judul">Tata Kelola Digital</strong><p style="font-size:13px;margin:.3rem 0 0;" class="misi-isi">Transparansi keuangan &amp; informasi dakwah berbasis digital.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="falsafah-row" id="falsafah-row">
+      <span>Keikhlasan</span><span>Amanah</span><span>Ukhuwah</span><span>Profesionalitas</span>
     </div>
   </div>
 </section>
 
 <section class="section">
   <div class="container">
-    <div class="section-head"><h2 style="margin:0;">Susunan Pengurus 2024–2029</h2></div>
+    <div class="section-head" style="display:block;text-align:center;margin-bottom:1.5rem;">
+      <h2 style="margin:0;">Susunan Pengurus 2024–2029</h2>
+      <p style="max-width:560px;margin:.4rem auto 0;">Struktur Dewan Kemakmuran Masjid — para asatidz, tokoh masyarakat, dan profesional yang mengemban amanah pelayanan umat Masjid Sabilul Huda.</p>
+    </div>
+
     <div id="pengurus-utama" data-skeleton></div>
-    <div id="pengurus-grid" class="pengurus-grid" data-skeleton></div>
+
+    <div class="filter-bar" id="filter-pengurus" style="justify-content:center;display:flex;gap:.5rem;flex-wrap:wrap;margin:1.5rem 0;">
+      <button class="pengurus-filter-tab active" data-filter="semua">Semua Dewan</button>
+      <button class="pengurus-filter-tab" data-filter="inti">Pengurus Inti</button>
+      <button class="pengurus-filter-tab" data-filter="bidang">Ketua Bidang</button>
+    </div>
+
+    <div id="pengurus-inti-wrap" data-skeleton>
+      <div class="inti-grid" id="pengurus-inti-grid"></div>
+    </div>
+    <div id="pengurus-bidang-wrap" style="margin-top:2rem;">
+      <h3 style="text-align:center;">Ketua Bidang Pelaksana Program</h3>
+      <div class="bidang-grid" id="pengurus-bidang-grid"></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background:var(--surface-container);">
+  <div class="container">
+    <h2>🛡 Akuntabilitas &amp; Legalitas Resmi</h2>
+    <p style="max-width:640px;">Seluruh aktivitas kelembagaan dan tata kelola dana jamaah di Masjid Sabilul Huda beroperasi secara akuntabel, terdaftar resmi sesuai regulasi dan registrasi resmi Pemerintah Republik Indonesia.</p>
+    <div class="grid grid-3" style="margin-top:1rem;">
+      <div class="akuntabilitas-box"><small>Nomor ID Masjid (Kemenag)</small><p id="info-id-masjid" style="font-weight:700;color:var(--primary);margin:.3rem 0 0;">01.4.12.08.02.00041</p></div>
+      <div class="akuntabilitas-box"><small>Surat Keputusan (SK) DKM</small><p id="info-sk-dkm" style="font-weight:700;color:var(--primary);margin:.3rem 0 0;">SK/014/DKM-SKM/2024</p></div>
+      <div class="akuntabilitas-box"><small>Rekening Infaq Bank Syariah</small><p id="info-rekening" style="font-weight:700;color:var(--primary);margin:.3rem 0 0;">771-2345-890 BSI a.n Masjid Sabilul Huda</p></div>
+    </div>
+
+    <div class="section-head" style="margin-top:2.5rem;"><h3 style="margin:0;">Unduh Dokumen &amp; Arsip Organisasi</h3><a href="kontak.html#donasi">Informasi Donasi Masjid →</a></div>
+    <p style="font-size:13px;margin-top:-.8rem;">Sebagai wujud transparansi, jamaah dapat mengunduh salinan resmi berkas ketetapan DKM Sabilul Huda.</p>
+    <div id="dokumen-wrap" class="grid grid-2"></div>
   </div>
 </section>
 
@@ -94,11 +149,11 @@
 
 <script src="js/config.js"></script>
 <script src="js/api.js"></script>
+<script src="js/shared.js"></script>
 <script>
-// [ADDITIVE v2 — Modul 05] Isi narasi Profil Website dari Pengaturan (hasil
-// edit Admin di admin/profil-website.html). Jika admin belum pernah mengisi
-// (key kosong/tidak ada), teks default yang sudah ada di HTML TETAP tampil
-// — tidak pernah menampilkan halaman kosong hanya karena belum dikonfigurasi.
+// [ADDITIVE] Isi narasi Profil Website dari Pengaturan (hasil edit Admin di
+// admin/profil-website.html). Jika admin belum pernah mengisi (key kosong),
+// teks default yang sudah ada di HTML TETAP tampil — tidak pernah kosong.
 async function muatProfilWebsiteDinamis_() {
   const res = await Api.get('pengaturan');
   if (!res.success) return;
@@ -110,6 +165,9 @@ async function muatProfilWebsiteDinamis_() {
   isi('stat-luas', 'profil_stat_luas');
   isi('stat-program', 'profil_stat_program');
   isi('stat-tahun', 'profil_stat_tahun');
+  isi('info-id-masjid', 'profil_nomor_id_masjid');
+  isi('info-sk-dkm', 'profil_sk_dkm_nomor');
+  isi('info-rekening', 'profil_rekening_infaq');
   if (map.profil_visi) document.getElementById('teks-visi').textContent = '"' + map.profil_visi + '"';
 
   const kartuMisi = document.querySelectorAll('#pilar-misi-grid .card');
@@ -119,28 +177,87 @@ async function muatProfilWebsiteDinamis_() {
     if (judul) kartu.querySelector('.misi-judul').textContent = judul;
     if (isiMisi) kartu.querySelector('.misi-isi').textContent = isiMisi;
   });
+
+  if (map.profil_falsafah) {
+    document.getElementById('falsafah-row').innerHTML = map.profil_falsafah.split(',').map(s => `<span>${s.trim()}</span>`).join('');
+  }
+
+  // Dokumen unduhan (opsional, tampil hanya jika admin sudah mengunggah)
+  const dokWrap = document.getElementById('dokumen-wrap');
+  const dokumen = [1, 2].map(i => ({
+    label: map['profil_dokumen' + i + '_label'], url: map['profil_dokumen' + i + '_url'], info: map['profil_dokumen' + i + '_info']
+  })).filter(d => d.label && d.url);
+  dokWrap.innerHTML = dokumen.length ? dokumen.map(d => `
+    <a class="dokumen-card" href="${d.url}" target="_blank" rel="noopener">
+      <span class="ic">📄</span>
+      <div><strong style="display:block;">${d.label}</strong><small style="color:var(--text-muted);">${d.info || 'Dokumen PDF'}</small></div>
+    </a>`).join('') : '<p class="empty-state" style="grid-column:1/-1;">Belum ada dokumen diunggah Administrator.</p>';
+}
+
+let SEMUA_PENGURUS = [];
+
+function renderPengurusUtama_(utama) {
+  document.getElementById('pengurus-utama').innerHTML = `
+    <div class="card pengurus-utama">
+      <span class="amanah-badge">Amanah Utama • ${utama.jabatan || 'Ketua Umum DKM'}</span>
+      ${utama.foto ? `<img src="${utama.foto}" alt="${utama.nama}">` : `<div class="ph" style="width:110px;height:110px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:30px;margin:0 auto;background:var(--surface-container);">👤</div>`}
+      <h3 style="margin:.6rem 0 .2rem;">${utama.nama}</h3>
+      ${utama.deskripsi ? `<p class="quote">"${utama.deskripsi}"</p>` : ''}
+      <div class="kontak-row">
+        ${utama.email ? `<span>✉️ ${utama.email}</span>` : ''}
+        ${utama.kontak || utama.telepon ? `<span>📞 ${utama.kontak || utama.telepon}</span>` : ''}
+      </div>
+    </div>`;
+}
+
+function renderPengurusFilter_(filter) {
+  const lainnya = SEMUA_PENGURUS.slice(1);
+  const inti = lainnya.filter(p => (p.kategori_jabatan || 'bidang') === 'inti');
+  const bidang = lainnya.filter(p => (p.kategori_jabatan || 'bidang') === 'bidang');
+
+  const intiWrap = document.getElementById('pengurus-inti-wrap');
+  const bidangWrap = document.getElementById('pengurus-bidang-wrap');
+  intiWrap.style.display = (filter === 'semua' || filter === 'inti') ? '' : 'none';
+  bidangWrap.style.display = (filter === 'semua' || filter === 'bidang') ? '' : 'none';
+
+  document.getElementById('pengurus-inti-grid').innerHTML = inti.length ? inti.map(p => `
+    <div class="card inti-card">
+      ${p.foto ? `<img src="${p.foto}" alt="${p.nama}">` : `<div class="ph" style="display:flex;align-items:center;justify-content:center;font-size:24px;">👤</div>`}
+      <strong style="display:block;">${p.nama}</strong>
+      <p style="font-size:13px;color:var(--gold-hover);font-weight:600;margin:.2rem 0;">${p.jabatan}</p>
+      ${p.deskripsi ? `<p style="font-size:12.5px;">${p.deskripsi}</p>` : ''}
+      ${p.periode ? `<p style="font-size:11px;color:var(--text-muted);">Amanah Sejak ${p.periode}</p>` : ''}
+      ${p.email ? `<p style="font-size:11px;color:var(--text-muted);">✉️ ${p.email}</p>` : ''}
+    </div>`).join('') : '<div class="empty-state">Belum ada data Pengurus Inti.</div>';
+
+  document.getElementById('pengurus-bidang-grid').innerHTML = bidang.length ? bidang.map(p => `
+    <div class="card bidang-card">
+      ${p.foto ? `<img src="${p.foto}" alt="${p.nama}">` : `<div class="ph">👤</div>`}
+      <strong style="display:block;font-size:14px;">${p.nama}</strong>
+      <p style="font-size:12px;color:var(--gold-hover);margin:.2rem 0;">${p.jabatan}</p>
+      ${p.deskripsi ? `<p style="font-size:11.5px;">${p.deskripsi}</p>` : ''}
+    </div>`).join('') : '<div class="empty-state">Belum ada data Ketua Bidang.</div>';
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_(); muatProfilWebsiteDinamis_(); catatKunjunganHalaman('profil');
+  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_(); muatMenuHeaderTambahan_(); muatProfilWebsiteDinamis_(); catatKunjunganHalaman('profil');
   const res = await Api.get('pengurus');
-  if (!res.success || !res.data.length) { document.getElementById('pengurus-grid').innerHTML = '<div class="empty-state">Data pengurus belum tersedia.</div>'; return; }
-  const list = res.data.slice().sort((a,b) => Number(a.urutan||99) - Number(b.urutan||99));
-  const utama = list[0], lainnya = list.slice(1);
-  document.getElementById('pengurus-utama').innerHTML = `
-    <div class="pengurus-utama">
-      ${utama.foto ? `<img src="${utama.foto}">` : `<div class="ph" style="display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-muted);">👤</div>`}
-      <h3 style="margin:.2rem 0;">${utama.nama}</h3>
-      <p style="color:var(--gold-hover);font-weight:600;">${utama.jabatan}</p>
-    </div>`;
-  document.getElementById('pengurus-grid').innerHTML = lainnya.map(p => `
-    <div class="card pengurus-card" style="padding:1.2rem;">
-      ${p.foto ? `<img src="${p.foto}">` : `<div class="ph" style="display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text-muted);">👤</div>`}
-      <strong>${p.nama}</strong>
-      <p style="font-size:13px;color:var(--gold-hover);margin:.2rem 0 0;">${p.jabatan}</p>
-    </div>`).join('');
+  if (!res.success || !res.data.length) {
+    document.getElementById('pengurus-utama').innerHTML = '<div class="empty-state">Data pengurus belum tersedia.</div>';
+    document.getElementById('pengurus-bidang-wrap').style.display = 'none';
+    return;
+  }
+  SEMUA_PENGURUS = res.data.slice().sort((a,b) => Number(a.urutan||99) - Number(b.urutan||99));
+  renderPengurusUtama_(SEMUA_PENGURUS[0]);
+  renderPengurusFilter_('semua');
+
+  document.getElementById('filter-pengurus').addEventListener('click', (e) => {
+    if (!e.target.matches('.pengurus-filter-tab')) return;
+    document.querySelectorAll('.pengurus-filter-tab').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    renderPengurusFilter_(e.target.getAttribute('data-filter'));
+  });
 });
 </script>
-<script src="js/shared.js"></script>
 </body>
 </html>

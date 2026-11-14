@@ -79,7 +79,7 @@
 <script>
 let SEMUA_PROGRAM = [];
 document.addEventListener('DOMContentLoaded', async () => {
-  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_(); catatKunjunganHalaman('program');
+  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_(); muatMenuHeaderTambahan_(); catatKunjunganHalaman('program');
   const res = await Api.get('program');
   if (!res.success || !res.data.length) { document.getElementById('program-grid').innerHTML = '<div class="empty-state">Belum ada program terbit.</div>'; return; }
   SEMUA_PROGRAM = res.data;

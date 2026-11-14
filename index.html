@@ -129,7 +129,12 @@
 <section class="section" style="padding-top:0;">
   <div class="container">
     <div class="section-head"><h2 style="margin:0;">Galeri Dokumentasi</h2><a href="galeri.html">Lihat Semua →</a></div>
-    <div id="galeri-grid" class="gallery-grid" data-skeleton></div>
+    <!-- [ADDITIVE v7] Galeri berjalan horizontal kiri→kanan -->
+    <div class="hcarousel-wrap">
+      <button class="hcarousel-btn prev" id="mini-gal-prev" aria-label="Geser ke kiri">←</button>
+      <div id="galeri-grid" class="hcarousel" data-skeleton></div>
+      <button class="hcarousel-btn next" id="mini-gal-next" aria-label="Geser ke kanan">→</button>
+    </div>
   </div>
 </section>
 

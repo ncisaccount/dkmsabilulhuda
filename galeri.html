@@ -17,7 +17,8 @@
   .search-box { padding:10px 16px; border-radius:var(--radius-full); border:1px solid var(--outline); min-width:220px; font-family:var(--font-body); }
   .gal-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
   @media (max-width:900px){ .gal-grid{grid-template-columns:repeat(2,1fr);} }
-  .gal-item { position:relative; aspect-ratio:4/3; border-radius:var(--radius-md); overflow:hidden; background-size:cover; background-position:center; background-color:var(--surface-container); cursor:pointer; }
+  .gal-item { position:relative; width:260px; aspect-ratio:4/3; border-radius:var(--radius-md); overflow:hidden; background-size:cover; background-position:center; background-color:var(--surface-container); cursor:pointer; }
+  @media (max-width:600px){ .gal-item{ width:200px; } }
   .gal-item .overlay { position:absolute; inset:0; background:linear-gradient(0deg,rgba(0,0,0,.65),transparent 50%); display:flex; align-items:flex-end; padding:.7rem; }
   .gal-item .overlay span { color:#fff; font-size:13px; font-weight:600; }
   .gal-item .play { position:absolute; top:8px; right:8px; background:rgba(0,0,0,.5); color:#fff; font-size:11px; padding:2px 8px; border-radius:var(--radius-full); }
@@ -58,9 +59,17 @@
       </div>
       <input type="search" id="search-box" class="search-box" placeholder="Cari dokumentasi, nama album...">
     </div>
-    <div id="gal-grid" class="gal-grid" data-skeleton>
-      <div class="gal-item skeleton"></div><div class="gal-item skeleton"></div><div class="gal-item skeleton"></div><div class="gal-item skeleton"></div>
+    <!-- [ADDITIVE v7] Galeri kini berjalan sebagai carousel horizontal (geser kiri→kanan),
+         bukan grid+paging seperti sebelumnya. Pola scroll-snap + tombol panah, tetap bisa
+         digeser langsung (mouse drag / swipe sentuh) tanpa JS tambahan untuk itu. -->
+    <div class="hcarousel-wrap">
+      <button class="hcarousel-btn prev" id="gal-prev" aria-label="Geser ke kiri">←</button>
+      <div id="gal-grid" class="hcarousel" data-skeleton>
+        <div class="gal-item skeleton" style="width:240px;"></div><div class="gal-item skeleton" style="width:240px;"></div><div class="gal-item skeleton" style="width:240px;"></div>
+      </div>
+      <button class="hcarousel-btn next" id="gal-next" aria-label="Geser ke kanan">→</button>
     </div>
+    <p style="font-size:12px;color:var(--text-muted);margin-top:.6rem;">👉 Geser untuk melihat dokumentasi lainnya</p>
   </div>
 </section>
 
@@ -86,7 +95,8 @@
 let SEMUA_GALERI = [];
 let state = { jenis: '', q: '' };
 document.addEventListener('DOMContentLoaded', async () => {
-  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_(); catatKunjunganHalaman('galeri');
+  initThemeToggleShared(); initMobileNavShared(); muatPengaturanSitusGlobal_(); muatMenuHeaderTambahan_(); catatKunjunganHalaman('galeri');
+  initHCarousel_('gal-grid', 'gal-prev', 'gal-next'); // [ADDITIVE v7]
   const res = await Api.get('galeri', { perHalaman: 300 });
   if (!res.success) { document.getElementById('gal-grid').innerHTML = `<div class="empty-state">${res.message}</div>`; return; }
   SEMUA_GALERI = res.data.items;
